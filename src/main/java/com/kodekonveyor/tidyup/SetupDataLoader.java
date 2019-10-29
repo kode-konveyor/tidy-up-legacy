@@ -37,16 +37,20 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         final Privilege customerPrivilege = createPrivilegeIfNotFound("CUSTOMER_PRIVILEGE");
         final Privilege workerPrivilege = createPrivilegeIfNotFound("WORKER_PRIVILEGE");
         final Privilege genericUserPrivilege = createPrivilegeIfNotFound("USER_PRIVILEGE");
+        final Privilege adminPrivilege = createPrivilegeIfNotFound("ADMIN_PRIVILEGE");
 
         // == create initial roles
         final List<Privilege> customerPrivileges = new ArrayList<Privilege>(Arrays.asList(customerPrivilege,genericUserPrivilege));
         final List<Privilege> workerPrivileges = new ArrayList<Privilege>(Arrays.asList(workerPrivilege,genericUserPrivilege));
-        final Role customerRole = createRoleIfNotFound("CUSTOMER", customerPrivileges);
-        final Role workerRole = createRoleIfNotFound("WORKER", workerPrivileges);
+        final List<Privilege> adminPrivileges = new ArrayList<Privilege>(Arrays.asList(workerPrivilege,customerPrivilege,genericUserPrivilege,adminPrivilege));
+        final Role customerRole = createRoleIfNotFound(RoleDto.CUSTOMER.toString(), customerPrivileges);
+        final Role workerRole = createRoleIfNotFound(RoleDto.WORKER.toString(), workerPrivileges);
+        final Role adminRole = createRoleIfNotFound("ADMIN", adminPrivileges);
 
         // == create initial user
         createUserIfNotFound("worker@test.com", "test", new ArrayList<Role>(Arrays.asList(workerRole)));
         createUserIfNotFound("customer@test.com", "test", new ArrayList<Role>(Arrays.asList(customerRole)));
+        createUserIfNotFound("admin@test.com", "test", new ArrayList<Role>(Arrays.asList(adminRole)));
 
         alreadySetup = true;
 
