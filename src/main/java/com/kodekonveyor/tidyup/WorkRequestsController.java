@@ -5,10 +5,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.security.core.userdetails.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resources;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -74,7 +80,11 @@ public class WorkRequestsController {
 	  @PostMapping
 	  public ResponseEntity<WorkRequestResource> post(
 	      @PathVariable final long userId, @RequestBody final WorkRequestDto inputRequest) {
-	    return tidyUserRepository
+		  User u = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		  if(tidyUserRepository.findByEmail(u.getUsername()).getId()!=userId)
+			  return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		  
+		  return tidyUserRepository
 	        .findById(userId)
 	        .map(
 	            p -> {
@@ -101,6 +111,9 @@ public class WorkRequestsController {
 	      @PathVariable final long userId,
 	      @PathVariable final long workRequestId,
 	      @RequestBody final WorkRequestDto inputRequest) {
+		  User u = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		  if(tidyUserRepository.findByEmail(u.getUsername()).getId()!=userId)
+			  return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 	    return tidyUserRepository
 	        .findById(userId)
 	        .map(
@@ -121,6 +134,9 @@ public class WorkRequestsController {
 	  @DeleteMapping("/{workRequestId}")
 	  public ResponseEntity<?> delete(
 	      @PathVariable final long userId, @PathVariable final long workRequestId) {
+		  User u = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		  if(tidyUserRepository.findByEmail(u.getUsername()).getId()!=userId)
+			  return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 	    return tidyUserRepository
 	        .findById(userId)
 	        .map(
