@@ -36,10 +36,11 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         // TODO
         final Privilege customerPrivilege = createPrivilegeIfNotFound("CUSTOMER_PRIVILEGE");
         final Privilege workerPrivilege = createPrivilegeIfNotFound("WORKER_PRIVILEGE");
+        final Privilege genericUserPrivilege = createPrivilegeIfNotFound("USER_PRIVILEGE");
 
         // == create initial roles
-        final List<Privilege> customerPrivileges = new ArrayList<Privilege>(Arrays.asList(customerPrivilege));
-        final List<Privilege> workerPrivileges = new ArrayList<Privilege>(Arrays.asList(workerPrivilege));
+        final List<Privilege> customerPrivileges = new ArrayList<Privilege>(Arrays.asList(customerPrivilege,genericUserPrivilege));
+        final List<Privilege> workerPrivileges = new ArrayList<Privilege>(Arrays.asList(workerPrivilege,genericUserPrivilege));
         final Role customerRole = createRoleIfNotFound("CUSTOMER", customerPrivileges);
         final Role workerRole = createRoleIfNotFound("WORKER", workerPrivileges);
 
