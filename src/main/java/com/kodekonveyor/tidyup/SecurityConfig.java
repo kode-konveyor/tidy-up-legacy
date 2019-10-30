@@ -52,6 +52,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable().authorizeRequests()
         .antMatchers("/").permitAll()
         .regexMatchers(HttpMethod.GET, "/users").hasAuthority("ADMIN_PRIVILEGE")
+        .regexMatchers(HttpMethod.GET, "/users/[0-9]*/workrequests").permitAll()
+        .regexMatchers(HttpMethod.POST, "/users/[0-9]*/workrequests").hasAuthority("CUSTOMER_PRIVILEGE")
+        .regexMatchers(HttpMethod.PUT, "/users/[0-9]*/workrequests").hasAuthority("CUSTOMER_PRIVILEGE")
+        .regexMatchers(HttpMethod.DELETE, "/users/[0-9]*/workrequests/[0-9]*").hasAuthority("CUSTOMER_PRIVILEGE")
         .anyRequest().authenticated()
         .and().httpBasic();
 	}
