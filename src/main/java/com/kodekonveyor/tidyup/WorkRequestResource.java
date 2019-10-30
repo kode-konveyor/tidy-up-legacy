@@ -4,13 +4,16 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @Getter
+@NoArgsConstructor
 public class WorkRequestResource extends ResourceSupport {
 	
-	private final WorkRequest workRequest;
+	private WorkRequest workRequest;
 	
 	  public WorkRequestResource(final WorkRequest workRequest) {
 		    this.workRequest = workRequest;
