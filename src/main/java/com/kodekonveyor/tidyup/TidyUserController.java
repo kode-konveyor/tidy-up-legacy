@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping(value = "/users", produces = "application/hal+json")
 public class TidyUserController {
@@ -53,7 +55,7 @@ public class TidyUserController {
 	}
 
 	@PostMapping
-	public ResponseEntity<TidyUserResource> post(@RequestBody final TidyUserDto tidyUserFromRequest) {
+	public ResponseEntity<TidyUserResource> post(@Valid @RequestBody final TidyUserDto tidyUserFromRequest) {
 		Optional<TidyUser> already = tidyUserRepository.findByEmail(tidyUserFromRequest.getEmail()); 
 		if(already.isPresent())
 			throw new TidyUserAlreadyRegisteredException(already.get().getEmail());
