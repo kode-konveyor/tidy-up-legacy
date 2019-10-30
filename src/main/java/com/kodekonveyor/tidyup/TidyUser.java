@@ -14,8 +14,6 @@ import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.JoinColumn;
-
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,10 +35,9 @@ public class TidyUser {
 	private String password;
 	
     @ManyToMany
-    // @JoinTable(name = "tidyusers_roles", joinColumns = @JoinColumn(name = "tidyuser_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private Collection<Role> roles;
     
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private Collection<WorkRequest> workRequests;
 
 }
