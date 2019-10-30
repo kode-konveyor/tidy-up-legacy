@@ -26,6 +26,12 @@ public class TidyUserControllerAdvice extends ResponseEntityExceptionHandler {
 	  @ExceptionHandler(IllegalArgumentException.class)
 	  public ResponseEntity<VndErrors> assertionException(final IllegalArgumentException e) {
 	    return error(e, HttpStatus.NOT_FOUND, e.getLocalizedMessage());
+	    
+
 	}
-	
+	  @ExceptionHandler(TidyUserAlreadyRegisteredException.class)
+	  public ResponseEntity<VndErrors> alreadyRegistered(final TidyUserAlreadyRegisteredException e) {
+	    return error(e, HttpStatus.CONFLICT, e.getEmail());
+	  }    
+    
 }

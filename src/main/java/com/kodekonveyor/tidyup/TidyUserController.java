@@ -13,6 +13,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -49,6 +50,10 @@ public class TidyUserController {
 
 	@PostMapping
 	public ResponseEntity<TidyUserResource> post(@RequestBody final TidyUserDto tidyUserFromRequest) {
+		Optional<TidyUser> already = tidyUserRepository.findByEmail(tidyUserFromRequest.getEmail()); 
+		if(already.isPresent())
+			throw new TidyUserAlreadyRegisteredException(already.get().getEmail());
+		
 		Role role = roleRepository.findByName(tidyUserFromRequest.getRole().toString());
 		TidyUser u = new TidyUser();
 		u.setEmail(tidyUserFromRequest.getEmail());

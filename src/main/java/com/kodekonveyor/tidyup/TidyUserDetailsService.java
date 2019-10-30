@@ -25,10 +25,11 @@ public class TidyUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(final String email) throws UsernameNotFoundException {
         try {
-            final TidyUser user = userRepository.findByEmail(email);
-            if (user == null) {
-                throw new UsernameNotFoundException("No user found with username: " + email);
-            }
+            final TidyUser user =
+            		userRepository
+            		.findByEmail(email)
+            		.map(u -> u)
+            		.orElseThrow(() -> new UsernameNotFoundException("No user found with username: " + email));
 
             return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), true, true, true, true, getAuthorities(user.getRoles()));
         } catch (final Exception e) {

@@ -87,7 +87,7 @@ public class WorkRequestsController {
 	  public ResponseEntity<WorkRequestResource> post(
 	      @PathVariable final long userId, @RequestBody final WorkRequestDto inputRequest) {
 		  User u = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		  if(tidyUserRepository.findByEmail(u.getUsername()).getId()!=userId)
+		  if(tidyUserRepository.findByEmail(u.getUsername()).get().getId()!=userId)
 			  return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		  
 		  return tidyUserRepository
@@ -118,7 +118,7 @@ public class WorkRequestsController {
 	      @PathVariable final long workRequestId,
 	      @RequestBody final WorkRequestDto inputRequest) {
 		  User u = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		  if(tidyUserRepository.findByEmail(u.getUsername()).getId()!=userId)
+		  if(tidyUserRepository.findByEmail(u.getUsername()).get().getId()!=userId)
 			  return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 	    return tidyUserRepository
 	        .findById(userId)
@@ -141,7 +141,7 @@ public class WorkRequestsController {
 	  public ResponseEntity<?> delete(
 	      @PathVariable final long userId, @PathVariable final long workRequestId) {
 		  User u = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		  if(tidyUserRepository.findByEmail(u.getUsername()).getId()!=userId)
+		  if(tidyUserRepository.findByEmail(u.getUsername()).get().getId()!=userId)
 			  return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 	    return tidyUserRepository
 	        .findById(userId)
