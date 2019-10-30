@@ -27,7 +27,6 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
-@RequestMapping("/users/{userId}/workrequests")
 public class WorkRequestsController {
 	
 	@Autowired
@@ -61,7 +60,7 @@ public class WorkRequestsController {
 	    tidyUserRepository.findById(userId).orElseThrow(() -> new TidyUserNotFoundException(userId));
 	  }
 
-	  @GetMapping("/{workRequestId}")
+	  @GetMapping("/users/{userId}/workrequests/{workRequestId}")
 	  public ResponseEntity<WorkRequestResource> get(
 	      @PathVariable final long userId, @PathVariable final long workRequestId) {
 	    return tidyUserRepository
@@ -77,7 +76,7 @@ public class WorkRequestsController {
 	        .orElseThrow(() -> new TidyUserNotFoundException(userId));
 	  }
 
-	  @PostMapping
+	  @PostMapping("/users/{userId}/workrequests")
 	  public ResponseEntity<WorkRequestResource> post(
 	      @PathVariable final long userId, @RequestBody final WorkRequestDto inputRequest) {
 		  User u = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -106,7 +105,7 @@ public class WorkRequestsController {
 	        .toUri();
 	  }
 
-	  @PutMapping("/{workRequestId}")
+	  @PutMapping("/users/{userId}/workrequests/{workRequestId}")
 	  public ResponseEntity<WorkRequestResource> put(
 	      @PathVariable final long userId,
 	      @PathVariable final long workRequestId,
@@ -131,7 +130,7 @@ public class WorkRequestsController {
 	        .orElseThrow(() -> new TidyUserNotFoundException(userId));
 	  }
 
-	  @DeleteMapping("/{workRequestId}")
+	  @DeleteMapping("/users/{userId}/workrequests/{workRequestId}")
 	  public ResponseEntity<?> delete(
 	      @PathVariable final long userId, @PathVariable final long workRequestId) {
 		  User u = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
