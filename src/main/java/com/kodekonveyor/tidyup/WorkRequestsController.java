@@ -35,7 +35,7 @@ public class WorkRequestsController {
 	@Autowired
 	private WorkRequestRepository workRequestRepository;
 	
-	@GetMapping
+	@GetMapping("/users/{userId}/workrequests")
 	  public ResponseEntity<Resources<WorkRequestResource>> all(@PathVariable final long userId) {
 	    final List<WorkRequestResource> collection = getWorkRequestsForUser(userId);
 	    final Resources<WorkRequestResource> resources = new Resources<>(collection);
