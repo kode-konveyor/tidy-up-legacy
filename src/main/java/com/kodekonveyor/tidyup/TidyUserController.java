@@ -65,13 +65,13 @@ public class TidyUserController {
 		u.setRoles(new ArrayList<Role>(Arrays.asList(role)));
 		u.setWorkRequests(new ArrayList<WorkRequest>());
 
-		final TidyUser person = tidyUserRepository.save(u);
+		final TidyUser user = tidyUserRepository.save(u);
 		final URI uri =
 				MvcUriComponentsBuilder.fromController(getClass())
 				.path("/{id}")
-				.buildAndExpand(person.getId())
+				.buildAndExpand(user.getId())
 				.toUri();
-		return ResponseEntity.created(uri).body(new TidyUserResource(u));
+		return ResponseEntity.created(uri).body(new TidyUserResource(user));
 	}
 
 	@PutMapping("/{id}")
