@@ -45,16 +45,23 @@ public class WorkRequestsController {
 	  }
 
 	  private List<WorkRequestResource> getWorkRequestsForUser(final long userId) {
-	    return tidyUserRepository
-	        .findById(userId)
-	        .map(
-	            p ->
-	                p.getWorkRequests()
-	                    .stream()
-	                    .map(WorkRequestResource::new)
-	                    .collect(Collectors.toList()))
-	        .orElseThrow(() -> new TidyUserNotFoundException(userId));
-	  }
+		    return tidyUserRepository
+		        .findById(userId)
+		        .map(
+		            p ->
+		                p.getWorkRequests()
+		                    .stream()
+		                    .map(WorkRequestResource::new)
+		                    .collect(Collectors.toList()))
+		        .orElseThrow(() -> new TidyUserNotFoundException(userId));
+		  }
+
+	  private List<WorkRequestResource> getWorkRequestsForCity(final String city) {
+		    return workRequestRepository
+		        .findAllByCity(city).stream()
+                .map(WorkRequestResource::new)
+                .collect(Collectors.toList());
+		  }
 
 	  private void validateUser(final long userId) {
 	    tidyUserRepository.findById(userId).orElseThrow(() -> new TidyUserNotFoundException(userId));
@@ -152,5 +159,13 @@ public class WorkRequestsController {
 	                    .orElseThrow(() -> new WorkRequestNotFoundException(workRequestId)))
 	        .orElseThrow(() -> new TidyUserNotFoundException(userId));
 	}
-
+	  
+	  @GetMapping("/workrequests/{city}")
+	  public ResponseEntity<Resources<WorkRequestResource>> city(@PathVariable final String city) {
+		    final List<WorkRequestResource> collection = getWorkRequestsForCity(city);
+		    final Resources<WorkRequestResource> resources = new Resources<>(collection);
+		    final String uriString = ServletUriComponentsBuilder.fromCurrentRequest().build().toUriString();
+		    resources.add(new Link(uriString, "self"));
+		    return ResponseEntity.ok(resources);
+		  }
 }
