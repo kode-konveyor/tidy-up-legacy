@@ -51,6 +51,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(final HttpSecurity http) throws Exception {
         http.csrf().disable().authorizeRequests()
         .antMatchers("/").permitAll()
+        .regexMatchers(HttpMethod.POST,"/users").permitAll()
         .regexMatchers(HttpMethod.GET, "/users").hasAuthority("ADMIN_PRIVILEGE")
         .regexMatchers(HttpMethod.GET, "/users/[0-9]*/workrequests").permitAll()
         .regexMatchers(HttpMethod.POST, "/users/[0-9]*/workrequests").hasAuthority("CUSTOMER_PRIVILEGE")
