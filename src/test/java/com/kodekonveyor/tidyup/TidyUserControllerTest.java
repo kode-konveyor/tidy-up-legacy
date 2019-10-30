@@ -70,10 +70,23 @@ public class TidyUserControllerTest {
     	public HttpEntity<TidyUserDto> u;
     };
     
-    private U createCustomer(Optional<String> email) {
+    @Test
+    public void notValidEmail() {
+        TidyUserDto u1 = new TidyUserDto();
+        u1.setEmail(UUID.randomUUID().toString());
+        u1.setRole(RoleDto.CUSTOMER);
+        u1.setPassword("test1");
+        
+        ResponseEntity<Void> r1 = restTemplate.postForEntity("/users", u1, Void.class);
+        logger.info(r1.toString());
+        
+        assertThat(r1.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+    
+    private U registerUser(Optional<String> email, RoleDto role) {
         TidyUserDto u1 = new TidyUserDto();
         u1.setEmail(email.orElse(UUID.randomUUID().toString()+"@test.com"));
-        u1.setRole(RoleDto.CUSTOMER);
+        u1.setRole(role);
         u1.setPassword("test1");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -91,7 +104,11 @@ public class TidyUserControllerTest {
     }
     
     private U registerCustomer() {
-    	return createCustomer(Optional.empty());
+    	return registerUser(Optional.empty(), RoleDto.CUSTOMER);
+    }
+    
+    private U registerWorker() {
+    	return registerUser(Optional.empty(), RoleDto.WORKER);
     }
     
 	    @Test
@@ -155,8 +172,57 @@ public class TidyUserControllerTest {
 	    	W w = addWorkRequest(u);
 	    	ResponseEntity<Void> r = restTemplate.withBasicAuth(u.u.getBody().getEmail(), u.u.getBody().getPassword()).exchange("http://localhost:"+port.toString()+w.self, HttpMethod.DELETE, null, Void.class);
 	        assertThat(r.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-	        ResponseEntity<Object> gone = restTemplate.withBasicAuth(u.u.getBody().getEmail(), u.u.getBody().getPassword()).getForEntity(w.self,Object.class);
-	        logger.info(gone.toString());
+	        ResponseEntity<VndErrors> gone = restTemplate.withBasicAuth(u.u.getBody().getEmail(), u.u.getBody().getPassword()).getForEntity(w.self,VndErrors.class);
 	        assertThat(gone.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 	    }
+	    
+	    @Test
+	    public void userCanDeleteAccount() {
+	    	U u = registerCustomer();
+	    	U other = registerCustomer();
+	    	ResponseEntity<Void> r = restTemplate.withBasicAuth(u.u.getBody().getEmail(), u.u.getBody().getPassword()).exchange("http://localhost:"+port.toString()+u.self, HttpMethod.DELETE, null, Void.class);
+	    	assertThat(r.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+	    	
+	    	ResponseEntity<VndErrors> gone = restTemplate.withBasicAuth(other.u.getBody().getEmail(), other.u.getBody().getPassword()).getForEntity(u.self,VndErrors.class);
+	        assertThat(gone.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+	    }
+	    
+	    @Test
+	    public void usersCanSeeEachothersWorkrequests() {
+	    	U u = registerCustomer();
+	    	U other = registerCustomer();
+	    	W w = addWorkRequest(u);
+	    	ResponseEntity<WorkRequestResource> r = restTemplate.withBasicAuth(other.u.getBody().getEmail(), other.u.getBody().getPassword()).getForEntity(w.self,WorkRequestResource.class);
+	        assertThat(r.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+	        ResponseEntity<WorkRequestResource> r2 = restTemplate.withBasicAuth(other.u.getBody().getEmail(), other.u.getBody().getPassword()).getForEntity(u.self+"/workrequests",WorkRequestResource.class);
+	        assertThat(r2.getStatusCode()).isEqualTo(HttpStatus.OK);
+	    }
+	    
+	    @Test
+	    public void workersCouldNotAddWorkrequests() {
+	    	U u = registerWorker();
+	    	WorkRequestDto req = new WorkRequestDto();
+	    	req.setCity("AOEU");
+	    	req.setDescription("Want my space to be tidy.");
+	    	ResponseEntity<WorkRequestResource> res = restTemplate.withBasicAuth(u.u.getBody().getEmail(), u.u.getBody().getPassword()).postForEntity(u.self+"/workrequests", req, WorkRequestResource.class);
+	    	logger.info(res.toString());
+	    	assertThat(res.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+
+	    }
+
+	    @Test
+	    public void workersCanSearchByCity() {
+	    	U u = registerWorker();
+	    	U customer = registerCustomer();
+	    	WorkRequestDto req = new WorkRequestDto();
+	    	req.setCity("AOEU");
+	    	req.setDescription("Want my space to be tidy.");
+	    	ResponseEntity<WorkRequestResource> res = restTemplate.withBasicAuth(customer.u.getBody().getEmail(), customer.u.getBody().getPassword()).postForEntity(customer.self+"/workrequests", req, WorkRequestResource.class);
+	    	assertThat(res.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+	    	ResponseEntity<WorkRequestResource> bycity = restTemplate.withBasicAuth(u.u.getBody().getEmail(), u.u.getBody().getPassword()).getForEntity("/workrequests/AOEU", WorkRequestResource.class);
+	    	assertThat(bycity.getStatusCode()).isEqualTo(HttpStatus.OK);
+	    }
+	    
 }
