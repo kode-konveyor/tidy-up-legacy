@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.VndErrors;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -215,16 +217,52 @@ public class TidyUserControllerTest {
 		TestUserData customer = registerCustomer();
 		WorkRequestDto req = new WorkRequestDto();
 		req.setCity(CITY);
-		req.setDescription("Want my space to be tidy.");
-		ResponseEntity<WorkRequestResource> res = restTemplate
+		String description = UUID.randomUUID().toString();
+		req.setDescription(description);
+		ResponseEntity<WorkRequestResource> response = restTemplate
 				.withBasicAuth(customer.dto.getEmail(), customer.dto.getPassword())
 				.postForEntity(customer.self + "/workrequests", req, WorkRequestResource.class);
-		assertThat(res.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-		ResponseEntity<WorkRequestResource> bycity = restTemplate
+		ParameterizedTypeReference<Resources<WorkRequestResource>> parameterizedTypeReference = new ParameterizedTypeReference<Resources<WorkRequestResource>>() {
+		};
+		ResponseEntity<Resources<WorkRequestResource>> bycity = restTemplate
 				.withBasicAuth(worker.dto.getEmail(), worker.dto.getPassword())
-				.getForEntity("/workrequests/"+CITY, WorkRequestResource.class);
+				.exchange("http://localhost:" + port.toString() + "/workrequests/" + CITY, HttpMethod.GET, null,
+						parameterizedTypeReference);
 		assertThat(bycity.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(bycity.getBody().getContent().size()).isGreaterThan(0);
+		bycity.getBody().getContent().forEach(w -> {
+			assertThat(w.getWorkRequest().getCity()).isEqualTo(CITY);
+		});
+		assertThat(bycity.getBody().getContent().stream()
+				.filter(w -> w.getWorkRequest().getDescription().equals(description)).count()).isEqualTo(1L);
+	}
+	
+	@Test
+	public void userChangingEmail() {
+		TestUserData worker = registerWorker();
+		TidyUserDto newDto = new TidyUserDto();
+
+		String newEmail = "foo" + worker.dto.getEmail();
+		newDto.setRole(worker.dto.getRole());
+		newDto.setEmail(newEmail);
+		newDto.setPassword(worker.dto.getPassword());
+
+		ResponseEntity<Void> putResponse = restTemplate.withBasicAuth(worker.dto.getEmail(), worker.dto.getPassword())
+				.exchange("http://localhost:" + port.toString() + worker.self, HttpMethod.PUT,
+						new HttpEntity<TidyUserDto>(newDto), Void.class);
+		assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+		ResponseEntity<TidyUserResource> responseOldEmail = restTemplate
+				.withBasicAuth(worker.dto.getEmail(), worker.dto.getPassword())
+				.getForEntity(worker.self, TidyUserResource.class);
+		assertThat(responseOldEmail.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+
+		ResponseEntity<TidyUserResource> responseNewEmail = restTemplate
+				.withBasicAuth(newEmail, worker.dto.getPassword()).getForEntity(worker.self, TidyUserResource.class);
+		assertThat(responseNewEmail.getStatusCode()).isEqualTo(HttpStatus.OK);
+
 	}
 
 }
