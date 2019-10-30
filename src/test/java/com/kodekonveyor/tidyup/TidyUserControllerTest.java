@@ -24,7 +24,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DisplayName("tidyuser behaviour")
+@DisplayName("tidyuser and workrequest behaviour")
 public class TidyUserControllerTest {
 	private static final Logger logger = LoggerFactory.getLogger(TidyUserControllerTest.class);
 
