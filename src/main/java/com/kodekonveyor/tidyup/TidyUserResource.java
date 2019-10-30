@@ -1,6 +1,8 @@
 package com.kodekonveyor.tidyup;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
 
@@ -8,9 +10,10 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @Getter
+@NoArgsConstructor
 public class TidyUserResource extends ResourceSupport {
 
-  private final TidyUser user;
+  private TidyUser user;
 
   public TidyUserResource(final TidyUser user) {
     this.user = user;
