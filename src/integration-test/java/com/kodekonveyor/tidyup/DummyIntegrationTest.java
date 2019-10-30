@@ -9,11 +9,4 @@ import org.springframework.boot.test.context.SpringBootTest;
 @DisplayName("dummy behaviour")
 @SpringBootTest
 public class DummyIntegrationTest {
-	@InjectMocks
-	private DummyService dummyService;
-
-	@Test
-	public void test() {
-		Assertions.assertTrue(dummyService.call());
-	}
 }

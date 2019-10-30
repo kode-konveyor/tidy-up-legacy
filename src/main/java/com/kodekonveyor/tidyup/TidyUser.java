@@ -4,12 +4,9 @@ import java.util.Collection;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -25,19 +22,20 @@ import lombok.Setter;
 @Entity
 @NoArgsConstructor
 public class TidyUser {
-	
-	@Id @GeneratedValue
+
+	@Id
+	@GeneratedValue
 	private Long id;
-	
+
 	private String email;
-	
+
 	@JsonIgnore
 	private String password;
-	
-    @ManyToMany
-    private Collection<Role> roles;
-    
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-    private Collection<WorkRequest> workRequests;
+
+	@ManyToMany
+	private Collection<Role> roles;
+
+	@OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+	private Collection<WorkRequest> workRequests;
 
 }

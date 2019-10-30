@@ -27,19 +27,18 @@ public class TidyUserController {
 
 	@Autowired
 	RoleRepository roleRepository;
-	
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    
-    public TidyUserController(TidyUserRepository repo) {
-    	this.tidyUserRepository = repo;
-    }
 
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
+	public TidyUserController(TidyUserRepository repo) {
+		this.tidyUserRepository = repo;
+	}
 
 	@GetMapping
 	public ResponseEntity<Resources<TidyUserResource>> all() {
-		final List<TidyUserResource> collection =
-				tidyUserRepository.findAll().stream().map(TidyUserResource::new).collect(Collectors.toList());
+		final List<TidyUserResource> collection = tidyUserRepository.findAll().stream().map(TidyUserResource::new)
+				.collect(Collectors.toList());
 		final Resources<TidyUserResource> resources = new Resources<>(collection);
 		final String uriString = ServletUriComponentsBuilder.fromCurrentRequest().build().toUriString();
 		resources.add(new Link(uriString, "self"));
@@ -48,18 +47,16 @@ public class TidyUserController {
 
 	@GetMapping("/{id}")
 	public ResponseEntity<TidyUserResource> get(@PathVariable final long id) {
-		return tidyUserRepository
-				.findById(id)
-				.map(p -> ResponseEntity.ok(new TidyUserResource(p)))
+		return tidyUserRepository.findById(id).map(p -> ResponseEntity.ok(new TidyUserResource(p)))
 				.orElseThrow(() -> new TidyUserNotFoundException(id));
 	}
 
 	@PostMapping
 	public ResponseEntity<TidyUserResource> post(@Valid @RequestBody final TidyUserDto tidyUserFromRequest) {
-		Optional<TidyUser> already = tidyUserRepository.findByEmail(tidyUserFromRequest.getEmail()); 
-		if(already.isPresent())
+		Optional<TidyUser> already = tidyUserRepository.findByEmail(tidyUserFromRequest.getEmail());
+		if (already.isPresent())
 			throw new TidyUserAlreadyRegisteredException(already.get().getEmail());
-		
+
 		Role role = roleRepository.findByName(tidyUserFromRequest.getRole().toString());
 		TidyUser u = new TidyUser();
 		u.setEmail(tidyUserFromRequest.getEmail());
@@ -68,17 +65,14 @@ public class TidyUserController {
 		u.setWorkRequests(new ArrayList<WorkRequest>());
 
 		final TidyUser user = tidyUserRepository.save(u);
-		final URI uri =
-				MvcUriComponentsBuilder.fromController(getClass())
-				.path("/{id}")
-				.buildAndExpand(user.getId())
+		final URI uri = MvcUriComponentsBuilder.fromController(getClass()).path("/{id}").buildAndExpand(user.getId())
 				.toUri();
 		return ResponseEntity.created(uri).body(new TidyUserResource(user));
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<TidyUserResource> put(
-			@PathVariable("id") final long id, @RequestBody TidyUserDto tidyUserFromRequest) {
+	public ResponseEntity<TidyUserResource> put(@PathVariable("id") final long id,
+			@RequestBody TidyUserDto tidyUserFromRequest) {
 		Role role = roleRepository.findByName(tidyUserFromRequest.getRole().toString());
 		TidyUser u = new TidyUser();
 		u.setEmail(tidyUserFromRequest.getEmail());
@@ -96,14 +90,9 @@ public class TidyUserController {
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> delete(@PathVariable("id") final long id) {
-		return tidyUserRepository
-				.findById(id)
-				.map(
-						p -> {
-							tidyUserRepository.deleteById(id);
-							return ResponseEntity.noContent().build();
-						})
-				.orElseThrow(() -> new TidyUserNotFoundException(id));
+		return tidyUserRepository.findById(id).map(p -> {
+			tidyUserRepository.deleteById(id);
+			return ResponseEntity.noContent().build();
+		}).orElseThrow(() -> new TidyUserNotFoundException(id));
 	}
 }
-

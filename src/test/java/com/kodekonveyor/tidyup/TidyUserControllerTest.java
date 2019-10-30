@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Optional;
 import java.util.UUID;
 
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -51,9 +50,9 @@ public class TidyUserControllerTest {
 		logger.info(response.toString());
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-		
+
 		// fixing
-		userDto.setEmail("hello@"+userDto.getEmail());
+		userDto.setEmail("hello@" + userDto.getEmail());
 
 		ResponseEntity<Void> good = restTemplate.postForEntity("/users", userDto, Void.class);
 		logger.info(good.toString());
@@ -119,8 +118,8 @@ public class TidyUserControllerTest {
 		public WorkRequestDto dto;
 		public String selfUri;
 	}
-	
-	private final static String CITY = "AOEU"; 
+
+	private final static String CITY = "AOEU";
 
 	private TestWorkRequestData addWorkRequest(TestUserData customer) {
 		WorkRequestDto requestDto = new WorkRequestDto();
@@ -159,10 +158,10 @@ public class TidyUserControllerTest {
 		TestUserData customer = registerCustomer();
 		TestWorkRequestData workrequest = addWorkRequest(customer);
 		ResponseEntity<Void> result = restTemplate.withBasicAuth(customer.dto.getEmail(), customer.dto.getPassword())
-				.exchange("http://localhost:" + port.toString() + workrequest.selfUri, HttpMethod.DELETE, null, Void.class);
+				.exchange("http://localhost:" + port.toString() + workrequest.selfUri, HttpMethod.DELETE, null,
+						Void.class);
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-		ResponseEntity<VndErrors> gone = restTemplate
-				.withBasicAuth(customer.dto.getEmail(), customer.dto.getPassword())
+		ResponseEntity<VndErrors> gone = restTemplate.withBasicAuth(customer.dto.getEmail(), customer.dto.getPassword())
 				.getForEntity(workrequest.selfUri, VndErrors.class);
 		assertThat(gone.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 	}
@@ -175,8 +174,7 @@ public class TidyUserControllerTest {
 				.exchange("http://localhost:" + port.toString() + customer.self, HttpMethod.DELETE, null, Void.class);
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-		ResponseEntity<VndErrors> gone = restTemplate
-				.withBasicAuth(other.dto.getEmail(), other.dto.getPassword())
+		ResponseEntity<VndErrors> gone = restTemplate.withBasicAuth(other.dto.getEmail(), other.dto.getPassword())
 				.getForEntity(customer.self, VndErrors.class);
 		assertThat(gone.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 	}
@@ -238,7 +236,7 @@ public class TidyUserControllerTest {
 		assertThat(bycity.getBody().getContent().stream()
 				.filter(w -> w.getWorkRequest().getDescription().equals(description)).count()).isEqualTo(1L);
 	}
-	
+
 	@Test
 	public void userChangingEmail() {
 		TestUserData worker = registerWorker();

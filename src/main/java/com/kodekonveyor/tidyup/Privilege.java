@@ -18,11 +18,12 @@ import lombok.Setter;
 @Entity
 @NoArgsConstructor
 public class Privilege {
-		@Id @GeneratedValue
-		private Long id;
-		private String name;
+	@Id
+	@GeneratedValue
+	private Long id;
+	private String name;
 
-	    @ManyToMany(mappedBy = "privileges")
-	    private Collection<Role> roles;
+	@ManyToMany(mappedBy = "privileges")
+	private Collection<Role> roles;
 
 }

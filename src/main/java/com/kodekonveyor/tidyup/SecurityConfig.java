@@ -19,50 +19,47 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-	
-    @Autowired
-    private UserDetailsService userDetailsService;
 
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
-    
-    @Override
-    protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(authProvider());
-    }
-    
-    @Bean
-    public DaoAuthenticationProvider authProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(encoder());
-        return authProvider;
-    }
+	@Autowired
+	private UserDetailsService userDetailsService;
 
-    @Bean
-    public PasswordEncoder encoder() {
-        return new BCryptPasswordEncoder(11);
-    }
+	@Bean
+	@Override
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
+	}
+
+	@Override
+	protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
+		auth.authenticationProvider(authProvider());
+	}
+
+	@Bean
+	public DaoAuthenticationProvider authProvider() {
+		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+		authProvider.setUserDetailsService(userDetailsService);
+		authProvider.setPasswordEncoder(encoder());
+		return authProvider;
+	}
+
+	@Bean
+	public PasswordEncoder encoder() {
+		return new BCryptPasswordEncoder(11);
+	}
 
 	@Override
 	protected void configure(final HttpSecurity http) throws Exception {
-        http.csrf().disable().authorizeRequests()
-        .antMatchers("/").permitAll()
-        .regexMatchers(HttpMethod.POST,"/users").permitAll()
-        .regexMatchers(HttpMethod.GET, "/users").hasAuthority("ADMIN_PRIVILEGE")
-        .regexMatchers(HttpMethod.GET, "/users/[0-9]*/workrequests").permitAll()
-        .regexMatchers(HttpMethod.POST, "/users/[0-9]*/workrequests").hasAuthority("CUSTOMER_PRIVILEGE")
-        .regexMatchers(HttpMethod.PUT, "/users/[0-9]*/workrequests").hasAuthority("CUSTOMER_PRIVILEGE")
-        .regexMatchers(HttpMethod.DELETE, "/users/[0-9]*/workrequests/[0-9]*").hasAuthority("CUSTOMER_PRIVILEGE")
-        .anyRequest().authenticated()
-        .and().httpBasic();
+		http.csrf().disable().authorizeRequests().antMatchers("/").permitAll().regexMatchers(HttpMethod.POST, "/users")
+				.permitAll().regexMatchers(HttpMethod.GET, "/users").hasAuthority("ADMIN_PRIVILEGE")
+				.regexMatchers(HttpMethod.GET, "/users/[0-9]*/workrequests").permitAll()
+				.regexMatchers(HttpMethod.POST, "/users/[0-9]*/workrequests").hasAuthority("CUSTOMER_PRIVILEGE")
+				.regexMatchers(HttpMethod.PUT, "/users/[0-9]*/workrequests").hasAuthority("CUSTOMER_PRIVILEGE")
+				.regexMatchers(HttpMethod.DELETE, "/users/[0-9]*/workrequests/[0-9]*")
+				.hasAuthority("CUSTOMER_PRIVILEGE").anyRequest().authenticated().and().httpBasic();
 	}
-	
-    @Bean
-    public SessionRegistry sessionRegistry() {
-        return new SessionRegistryImpl();
-    }
+
+	@Bean
+	public SessionRegistry sessionRegistry() {
+		return new SessionRegistryImpl();
+	}
 }
