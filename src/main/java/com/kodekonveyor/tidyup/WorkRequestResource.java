@@ -16,9 +16,11 @@ public class WorkRequestResource extends ResourceSupport {
 		    this.workRequest = workRequest;
 		    final long id = workRequest.getId();
 		    final long userId = workRequest.getUser().getId();
+		    final String city = workRequest.getCity();
 		    add(new Link(String.valueOf(id), "request-id"));
 		    add(linkTo(methodOn(WorkRequestsController.class).all(userId)).withRel("all-owner-requests"));
 		    add(linkTo(methodOn(TidyUserController.class).get(userId)).withRel("owner"));
+		    add(linkTo(methodOn(WorkRequestsController.class).city(city)).withRel("all-requests-from-city"));
 		    add(linkTo(methodOn(WorkRequestsController.class).get(userId, id)).withSelfRel());
 		}
 
