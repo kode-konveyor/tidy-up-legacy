@@ -28,6 +28,10 @@ public class TidyUserController {
 	
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
+    public TidyUserController(TidyUserRepository repo) {
+    	this.tidyUserRepository = repo;
+    }
 
 
 	@GetMapping
