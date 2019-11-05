@@ -67,7 +67,11 @@ public class TidyUserController {
 		userToRegister.setWorkRequests(new ArrayList<WorkRequest>());
 
 		final TidyUser user = tidyUserRepository.save(userToRegister);
-		final URI uri = MvcUriComponentsBuilder.fromController(getClass()).path("/{id}").buildAndExpand(user.getId())
+		final Long id = user.getId();
+		final URI uri = ServletUriComponentsBuilder
+				.fromCurrentRequest()
+				.path("/{id}")
+				.buildAndExpand(id)
 				.toUri();
 		return ResponseEntity.created(uri).body(new TidyUserResource(user));
 	}
