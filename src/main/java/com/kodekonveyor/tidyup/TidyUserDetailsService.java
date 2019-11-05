@@ -9,6 +9,7 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,15 +25,10 @@ public class TidyUserDetailsService implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(final String email) throws UsernameNotFoundException {
-		try {
-			final TidyUser user = userRepository.findByEmail(email).map(u -> u)
-					.orElseThrow(() -> new UsernameNotFoundException("No user found with username: " + email));
+		final TidyUser user = userRepository.findByEmail(email).map(u -> u)
+				.orElseThrow(() -> new UsernameNotFoundException("No user found with username: " + email));
 
-			return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), true,
-					true, true, true, getAuthorities(user.getRoles()));
-		} catch (final Exception e) {
-			throw new RuntimeException(e);
-		}
+		return new User(user.getEmail(), user.getPassword(), true, true, true, true, getAuthorities(user.getRoles()));
 	}
 
 	private final Collection<? extends GrantedAuthority> getAuthorities(final Collection<Role> roles) {
