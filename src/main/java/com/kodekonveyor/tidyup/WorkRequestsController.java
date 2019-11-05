@@ -67,16 +67,16 @@ public class WorkRequestsController {
 	@PostMapping("/users/{userId}/workrequests")
 	public ResponseEntity<WorkRequestResource> post(@PathVariable final long userId,
 			@RequestBody final WorkRequestDto inputRequest) {
-		User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if (tidyUserRepository.findByEmail(u.getUsername()).get().getId() != userId)
+		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		if (tidyUserRepository.findByEmail(user.getUsername()).get().getId() != userId)
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 
 		return tidyUserRepository.findById(userId).map(p -> {
-			WorkRequest r = new WorkRequest();
-			r.setCity(inputRequest.getCity());
-			r.setDescription(inputRequest.getDescription());
-			r.setUser(p);
-			WorkRequest request = workRequestRepository.save(r);
+			WorkRequest requestToSave = new WorkRequest();
+			requestToSave.setCity(inputRequest.getCity());
+			requestToSave.setDescription(inputRequest.getDescription());
+			requestToSave.setUser(p);
+			WorkRequest request = workRequestRepository.save(requestToSave);
 			final URI uri = createPostUri(request);
 			return ResponseEntity.created(uri).body(new WorkRequestResource(request));
 		}).orElseThrow(() -> new TidyUserNotFoundException(userId));
@@ -90,16 +90,16 @@ public class WorkRequestsController {
 	@PutMapping("/users/{userId}/workrequests/{workRequestId}")
 	public ResponseEntity<WorkRequestResource> put(@PathVariable final long userId,
 			@PathVariable final long workRequestId, @RequestBody final WorkRequestDto inputRequest) {
-		User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if (tidyUserRepository.findByEmail(u.getUsername()).get().getId() != userId)
+		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		if (tidyUserRepository.findByEmail(user.getUsername()).get().getId() != userId)
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		return tidyUserRepository.findById(userId).map(p -> {
-			WorkRequest r = new WorkRequest();
-			r.setCity(inputRequest.getCity());
-			r.setDescription(inputRequest.getDescription());
-			r.setUser(p);
-			r.setId(workRequestId);
-			WorkRequest request = workRequestRepository.save(r);
+			WorkRequest requestToSave = new WorkRequest();
+			requestToSave.setCity(inputRequest.getCity());
+			requestToSave.setDescription(inputRequest.getDescription());
+			requestToSave.setUser(p);
+			requestToSave.setId(workRequestId);
+			WorkRequest request = workRequestRepository.save(requestToSave);
 			final URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentRequest().toUriString());
 			return ResponseEntity.created(uri).body(new WorkRequestResource(request));
 		}).orElseThrow(() -> new TidyUserNotFoundException(userId));
@@ -107,8 +107,8 @@ public class WorkRequestsController {
 
 	@DeleteMapping("/users/{userId}/workrequests/{workRequestId}")
 	public ResponseEntity<?> delete(@PathVariable final long userId, @PathVariable final long workRequestId) {
-		User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if (tidyUserRepository.findByEmail(u.getUsername()).get().getId() != userId)
+		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		if (tidyUserRepository.findByEmail(user.getUsername()).get().getId() != userId)
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		return tidyUserRepository.findById(userId)
 				.map(p -> p.getWorkRequests().stream().filter(m -> m.getId().equals(workRequestId)).findAny().map(m -> {
