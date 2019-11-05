@@ -31,8 +31,10 @@ public class TidyUserController {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
-	public TidyUserController(TidyUserRepository repo) {
-		this.tidyUserRepository = repo;
+	public TidyUserController(TidyUserRepository tidyUserRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+		this.tidyUserRepository = tidyUserRepository;
+		this.roleRepository = roleRepository;
+		this.passwordEncoder = passwordEncoder;
 	}
 
 	@GetMapping
