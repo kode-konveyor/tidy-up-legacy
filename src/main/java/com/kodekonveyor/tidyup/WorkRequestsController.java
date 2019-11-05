@@ -24,6 +24,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @RestController
 public class WorkRequestsController {
 
+	private static final String SELF = "self";
+
 	@Autowired
 	private TidyUserRepository tidyUserRepository;
 
@@ -35,7 +37,7 @@ public class WorkRequestsController {
 		final List<WorkRequestResource> collection = getWorkRequestsForUser(userId);
 		final Resources<WorkRequestResource> resources = new Resources<>(collection);
 		final String uriString = ServletUriComponentsBuilder.fromCurrentRequest().build().toUriString();
-		resources.add(new Link(uriString, "self"));
+		resources.add(new Link(uriString, SELF));
 		return ResponseEntity.ok(resources);
 	}
 
@@ -123,7 +125,7 @@ public class WorkRequestsController {
 		final List<WorkRequestResource> collection = getWorkRequestsForCity(city);
 		final Resources<WorkRequestResource> resources = new Resources<>(collection);
 		final String uriString = ServletUriComponentsBuilder.fromCurrentRequest().build().toUriString();
-		resources.add(new Link(uriString, "self"));
+		resources.add(new Link(uriString, SELF));
 		return ResponseEntity.ok(resources);
 	}
 }
