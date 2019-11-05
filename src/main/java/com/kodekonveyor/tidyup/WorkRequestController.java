@@ -17,11 +17,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
+@RequestMapping(value = "", produces = "application/hal+json")
 public class WorkRequestController {
 
 	private static final String SELF = "self";
@@ -31,6 +33,11 @@ public class WorkRequestController {
 
 	@Autowired
 	private WorkRequestRepository workRequestRepository;
+	
+	public WorkRequestController (TidyUserRepository tidyUserRepository, WorkRequestRepository workRequestRepository) {
+		this.tidyUserRepository = tidyUserRepository;
+		this.workRequestRepository = workRequestRepository;
+	}
 
 	@GetMapping("/users/{userId}/workrequests")
 	public ResponseEntity<Resources<WorkRequestResource>> all(@PathVariable final long userId) {
@@ -42,8 +49,14 @@ public class WorkRequestController {
 	}
 
 	private List<WorkRequestResource> getWorkRequestsForUser(final long userId) {
-		return tidyUserRepository.findById(userId)
-				.map(p -> p.getWorkRequests().stream().map(WorkRequestResource::new).collect(Collectors.toList()))
+		return tidyUserRepository
+				.findById(userId)
+				.map(
+						p -> p
+						.getWorkRequests()
+						.stream()
+						.map(WorkRequestResource::new)
+						.collect(Collectors.toList()))
 				.orElseThrow(() -> new TidyUserNotFoundException(userId));
 	}
 
@@ -60,7 +73,12 @@ public class WorkRequestController {
 	public ResponseEntity<WorkRequestResource> get(@PathVariable final long userId,
 			@PathVariable final long workRequestId) {
 		return tidyUserRepository.findById(userId)
-				.map(p -> p.getWorkRequests().stream().filter(m -> m.getId().equals(workRequestId)).findAny()
+				.map(
+						p -> p
+						.getWorkRequests()
+						.stream()
+						.filter(m -> m.getId().equals(workRequestId))
+						.findAny()
 						.map(m -> ResponseEntity.ok(new WorkRequestResource(m)))
 						.orElseThrow(() -> new WorkRequestNotFoundException(workRequestId)))
 				.orElseThrow(() -> new TidyUserNotFoundException(userId));
