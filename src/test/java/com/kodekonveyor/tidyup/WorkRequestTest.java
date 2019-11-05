@@ -2,6 +2,7 @@ package com.kodekonveyor.tidyup;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -47,9 +48,20 @@ public class WorkRequestTest {
 	@Test
 	void getForUser() {
 		when(tidyUserRepository.findById(_42L)).thenReturn(user());
-
 		ResponseEntity<WorkRequestResource> response = workRequestController.get(_42L,user().get().getWorkRequests().iterator().next().getId());
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+	}
+	
+	@Test
+	void getForNonExistentUser() {
+		when(tidyUserRepository.findById(_42L)).thenReturn(Optional.empty());
+		assertThrows(TidyUserNotFoundException.class, () -> { workRequestController.get(_42L,user().get().getWorkRequests().iterator().next().getId()); });
+	}
+
+	@Test
+	void getNonExistentForUser() {
+		when(tidyUserRepository.findById(_42L)).thenReturn(Optional.empty());
+		assertThrows(TidyUserNotFoundException.class, () -> { workRequestController.get(_42L,user().get().getWorkRequests().iterator().next().getId()+1L); });
 	}
 	
 	@Test
@@ -60,6 +72,15 @@ public class WorkRequestTest {
 		when(tidyUserRepository.findById(_42L)).thenReturn(user());
 		ResponseEntity<Resources<WorkRequestResource>> response = workRequestController.all(_42L);
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+	}
+	
+	@Test
+	void getAllForNonExistentUser() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+        
+		when(tidyUserRepository.findById(_42L)).thenReturn(Optional.empty());
+		assertThrows(TidyUserNotFoundException.class, () -> { workRequestController.all(_42L); });
 	}
 	
 	private Role role() {
