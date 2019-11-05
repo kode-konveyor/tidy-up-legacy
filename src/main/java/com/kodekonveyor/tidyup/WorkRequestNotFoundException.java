@@ -4,6 +4,8 @@ import lombok.Getter;
 
 @Getter
 public class WorkRequestNotFoundException extends RuntimeException {
+
+	private static final long serialVersionUID = 903319701438951429L;
 	private final long id;
 
 	public WorkRequestNotFoundException(final long id) {
