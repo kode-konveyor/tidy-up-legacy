@@ -26,6 +26,8 @@ import org.springframework.http.ResponseEntity;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DisplayName("tidyuser and workrequest behaviour")
 public class TidyUserControllerTest {
+	private static final String HTTP_LOCALHOST = "http://localhost:";
+
 	private static final Logger logger = LoggerFactory.getLogger(TidyUserControllerTest.class);
 
 	@Autowired
@@ -158,7 +160,7 @@ public class TidyUserControllerTest {
 		TestUserData customer = registerCustomer();
 		TestWorkRequestData workrequest = addWorkRequest(customer);
 		ResponseEntity<Void> result = restTemplate.withBasicAuth(customer.dto.getEmail(), customer.dto.getPassword())
-				.exchange("http://localhost:" + port.toString() + workrequest.selfUri, HttpMethod.DELETE, null,
+				.exchange(HTTP_LOCALHOST + port.toString() + workrequest.selfUri, HttpMethod.DELETE, null,
 						Void.class);
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 		ResponseEntity<VndErrors> gone = restTemplate.withBasicAuth(customer.dto.getEmail(), customer.dto.getPassword())
@@ -171,7 +173,7 @@ public class TidyUserControllerTest {
 		TestUserData customer = registerCustomer();
 		TestUserData other = registerCustomer();
 		ResponseEntity<Void> response = restTemplate.withBasicAuth(customer.dto.getEmail(), customer.dto.getPassword())
-				.exchange("http://localhost:" + port.toString() + customer.self, HttpMethod.DELETE, null, Void.class);
+				.exchange(HTTP_LOCALHOST + port.toString() + customer.self, HttpMethod.DELETE, null, Void.class);
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
 		ResponseEntity<VndErrors> gone = restTemplate.withBasicAuth(other.dto.getEmail(), other.dto.getPassword())
@@ -226,7 +228,7 @@ public class TidyUserControllerTest {
 		};
 		ResponseEntity<Resources<WorkRequestResource>> bycity = restTemplate
 				.withBasicAuth(worker.dto.getEmail(), worker.dto.getPassword())
-				.exchange("http://localhost:" + port.toString() + "/workrequests/" + CITY, HttpMethod.GET, null,
+				.exchange(HTTP_LOCALHOST + port.toString() + "/workrequests/" + CITY, HttpMethod.GET, null,
 						parameterizedTypeReference);
 		assertThat(bycity.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(bycity.getBody().getContent().size()).isGreaterThan(0);
@@ -248,7 +250,7 @@ public class TidyUserControllerTest {
 		newDto.setPassword(worker.dto.getPassword());
 
 		ResponseEntity<Void> putResponse = restTemplate.withBasicAuth(worker.dto.getEmail(), worker.dto.getPassword())
-				.exchange("http://localhost:" + port.toString() + worker.self, HttpMethod.PUT,
+				.exchange(HTTP_LOCALHOST + port.toString() + worker.self, HttpMethod.PUT,
 						new HttpEntity<TidyUserDto>(newDto), Void.class);
 		assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
