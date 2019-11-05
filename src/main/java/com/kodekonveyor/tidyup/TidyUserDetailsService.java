@@ -3,6 +3,7 @@ package com.kodekonveyor.tidyup;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -36,16 +37,10 @@ public class TidyUserDetailsService implements UserDetailsService {
 	}
 
 	private final List<String> getPrivileges(final Collection<Role> roles) {
-		final List<String> privileges = new ArrayList<String>();
-		final List<Privilege> collection = new ArrayList<Privilege>();
-		for (final Role role : roles) {
-			collection.addAll(role.getPrivileges());
-		}
-		for (final Privilege item : collection) {
-			privileges.add(item.getName());
-		}
-
-		return privileges;
+		return roles.stream()
+                .flatMap(role -> role.getPrivileges().stream())
+                .map(Privilege::getName)
+                .collect(Collectors.toList());
 	}
 
 	private final List<GrantedAuthority> getGrantedAuthorities(final List<String> privileges) {
