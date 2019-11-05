@@ -7,7 +7,6 @@ import javax.validation.constraints.Email;
 
 @Getter
 @Setter
-@NoArgsConstructor
 public class TidyUserDto {
 	@Email
 	private String email;
