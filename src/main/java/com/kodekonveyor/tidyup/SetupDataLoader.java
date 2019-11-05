@@ -83,10 +83,10 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 	private final TidyUser createUserIfNotFound(final String email, final String password,
 			final Collection<Role> roles) {
 		TidyUser user = userRepository.findByEmail(email).map(u -> u).orElseGet(() -> {
-			TidyUser u = new TidyUser();
-			u.setPassword(passwordEncoder.encode(password));
-			u.setEmail(email);
-			return u;
+			TidyUser newUser = new TidyUser();
+			newUser.setPassword(passwordEncoder.encode(password));
+			newUser.setEmail(email);
+			return newUser;
 		});
 
 		user.setRoles(roles);

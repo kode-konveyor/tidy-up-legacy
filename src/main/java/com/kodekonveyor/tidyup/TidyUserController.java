@@ -58,13 +58,13 @@ public class TidyUserController {
 			throw new TidyUserAlreadyRegisteredException(already.get().getEmail());
 
 		Role role = roleRepository.findByName(tidyUserFromRequest.getRole().toString());
-		TidyUser u = new TidyUser();
-		u.setEmail(tidyUserFromRequest.getEmail());
-		u.setPassword(passwordEncoder.encode(tidyUserFromRequest.getPassword()));
-		u.setRoles(new ArrayList<Role>(Arrays.asList(role)));
-		u.setWorkRequests(new ArrayList<WorkRequest>());
+		TidyUser userToRegister = new TidyUser();
+		userToRegister.setEmail(tidyUserFromRequest.getEmail());
+		userToRegister.setPassword(passwordEncoder.encode(tidyUserFromRequest.getPassword()));
+		userToRegister.setRoles(new ArrayList<Role>(Arrays.asList(role)));
+		userToRegister.setWorkRequests(new ArrayList<WorkRequest>());
 
-		final TidyUser user = tidyUserRepository.save(u);
+		final TidyUser user = tidyUserRepository.save(userToRegister);
 		final URI uri = MvcUriComponentsBuilder.fromController(getClass()).path("/{id}").buildAndExpand(user.getId())
 				.toUri();
 		return ResponseEntity.created(uri).body(new TidyUserResource(user));
@@ -74,14 +74,14 @@ public class TidyUserController {
 	public ResponseEntity<TidyUserResource> put(@PathVariable("id") final long id,
 			@RequestBody TidyUserDto tidyUserFromRequest) {
 		Role role = roleRepository.findByName(tidyUserFromRequest.getRole().toString());
-		TidyUser u = new TidyUser();
-		u.setEmail(tidyUserFromRequest.getEmail());
-		u.setPassword(passwordEncoder.encode(tidyUserFromRequest.getPassword()));
-		u.setRoles(new ArrayList<Role>(Arrays.asList(role)));
-		u.setWorkRequests(new ArrayList<WorkRequest>());
-		u.setId(id);
+		TidyUser user = new TidyUser();
+		user.setEmail(tidyUserFromRequest.getEmail());
+		user.setPassword(passwordEncoder.encode(tidyUserFromRequest.getPassword()));
+		user.setRoles(new ArrayList<Role>(Arrays.asList(role)));
+		user.setWorkRequests(new ArrayList<WorkRequest>());
+		user.setId(id);
 
-		final TidyUser person = tidyUserRepository.save(u);
+		final TidyUser person = tidyUserRepository.save(user);
 
 		final TidyUserResource resource = new TidyUserResource(person);
 		final URI uri = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
