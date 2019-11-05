@@ -2,9 +2,7 @@ package com.kodekonveyor.tidyup;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -36,6 +34,17 @@ public class TidyUserTest {
 	@BeforeEach
 	void setup() {
 		this.tidyUserController = new TidyUserController(tidyUserRepository, roleRepository, passwordEncoder);
+	}
+	
+	private static final String CITY = "CITY";
+	private static final String REQUEST_DESCRIPTION = "want my space to be tidy";
+	private WorkRequest workRequest(TidyUser user) {
+		WorkRequest request = new WorkRequest();
+		request.setCity(CITY);
+		request.setDescription(REQUEST_DESCRIPTION);
+		request.setId(_42L);
+		request.setUser(user);
+		return request;
 	}
 
 	@Test
@@ -138,7 +147,7 @@ public class TidyUserTest {
 		user.setEmail(USER_EMAIL);
 		user.setPassword(USER_PASSWORD_ENCODED);
 		user.setRoles(new ArrayList<Role>(Arrays.asList(role())));
-		user.setWorkRequests(new ArrayList<WorkRequest>());
+		user.setWorkRequests(new ArrayList<WorkRequest>(Arrays.asList(workRequest(user))));
 		return Optional.of(user);
 	}
 
