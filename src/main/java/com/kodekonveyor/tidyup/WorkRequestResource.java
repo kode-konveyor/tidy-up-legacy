@@ -26,10 +26,10 @@ public class WorkRequestResource extends ResourceSupport {
 		final long userId = workRequest.getUser().getId();
 		final String city = workRequest.getCity();
 		add(new Link(String.valueOf(id), REQUEST_ID));
-		add(linkTo(methodOn(WorkRequestsController.class).all(userId)).withRel(ALL_OWNER_REQUESTS));
+		add(linkTo(methodOn(WorkRequestController.class).all(userId)).withRel(ALL_OWNER_REQUESTS));
 		add(linkTo(methodOn(TidyUserController.class).get(userId)).withRel(OWNER));
-		add(linkTo(methodOn(WorkRequestsController.class).city(city)).withRel(ALL_REQUESTS_FROM_CITY));
-		add(linkTo(methodOn(WorkRequestsController.class).get(userId, id)).withSelfRel());
+		add(linkTo(methodOn(WorkRequestController.class).city(city)).withRel(ALL_REQUESTS_FROM_CITY));
+		add(linkTo(methodOn(WorkRequestController.class).get(userId, id)).withSelfRel());
 	}
 
 }

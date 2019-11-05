@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.Optional;
 
-@ControllerAdvice(assignableTypes = WorkRequestsController.class)
+@ControllerAdvice(assignableTypes = WorkRequestController.class)
 @RequestMapping(produces = "application/vnd.error+json")
 public class WorkRequestControllerAdvice {
 

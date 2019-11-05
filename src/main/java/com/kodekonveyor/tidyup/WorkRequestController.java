@@ -22,7 +22,7 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
-public class WorkRequestsController {
+public class WorkRequestController {
 
 	private static final String SELF = "self";
 

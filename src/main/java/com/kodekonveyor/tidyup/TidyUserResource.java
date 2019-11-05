@@ -15,7 +15,7 @@ public class TidyUserResource extends ResourceSupport {
 	public TidyUserResource(final TidyUser user) {
 		final long id = user.getId();
 		add(linkTo(TidyUserController.class).withRel(ALL_USERS));
-		add(linkTo(methodOn(WorkRequestsController.class).all(id)).withRel(USER_WORKREQUESTS));
+		add(linkTo(methodOn(WorkRequestController.class).all(id)).withRel(USER_WORKREQUESTS));
 		add(linkTo(methodOn(TidyUserController.class).get(id)).withSelfRel());
 	}
 }
