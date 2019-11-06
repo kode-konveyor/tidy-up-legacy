@@ -65,10 +65,6 @@ public class WorkRequestController {
 				.collect(Collectors.toList());
 	}
 
-	private void validateUser(final long userId) {
-		tidyUserRepository.findById(userId).orElseThrow(() -> new TidyUserNotFoundException(userId));
-	}
-
 	@GetMapping("/users/{userId}/workrequests/{workRequestId}")
 	public ResponseEntity<WorkRequestResource> get(@PathVariable final long userId,
 			@PathVariable final long workRequestId) {
@@ -103,8 +99,11 @@ public class WorkRequestController {
 	}
 
 	private URI createPostUri(final WorkRequest workRequest) {
-		return MvcUriComponentsBuilder.fromController(getClass()).path("/{workRequestId}")
-				.buildAndExpand(workRequest.getUser().getId(), workRequest.getId()).toUri();
+		return ServletUriComponentsBuilder
+				.fromCurrentRequest()
+				.path("/{workRequestId}")
+				.buildAndExpand(workRequest.getUser().getId(), workRequest.getId())
+				.toUri();
 	}
 
 	@PutMapping("/users/{userId}/workrequests/{workRequestId}")
