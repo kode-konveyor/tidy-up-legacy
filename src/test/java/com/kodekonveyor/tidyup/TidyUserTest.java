@@ -134,6 +134,9 @@ public class TidyUserTest {
 	
 	@Test
 	public void allTest() {
+		MockHttpServletRequest request = new MockHttpServletRequest();
+		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+
 		when(tidyUserRepository.findAll()).thenReturn(new ArrayList<TidyUser>(Arrays.asList(user().get())));
 		ResponseEntity<Resources<TidyUserResource>> response = tidyUserController.all();
 		assertThat(response.getBody().getContent().size()).isEqualTo(1);
@@ -141,11 +144,13 @@ public class TidyUserTest {
 	
 	@Test
 	public void allStatus() {
+		MockHttpServletRequest request = new MockHttpServletRequest();
+		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+
 		when(tidyUserRepository.findAll()).thenReturn(new ArrayList<TidyUser>(Arrays.asList(user().get())));
 		ResponseEntity<Resources<TidyUserResource>> response = tidyUserController.all();
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 	}
-	
 	
 	private UserRole role() {
 		UserRole role = new UserRole();
