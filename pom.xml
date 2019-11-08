@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.kodekonveyor</groupId>
 	<artifactId>tidy-up</artifactId>
-	<version>0.0.1-feature_toolchain.c76b4af</version>
+	<version>0.0.1-feature_tidy-up-mvp.4bbd5b4</version>
 	<name>tidy up</name>
 	<url>http://maven.apache.org</url>
 	<description>A work exchange MVP</description>
@@ -169,6 +169,29 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.2</version>
+                <executions>
+                        <execution>
+                                <goals>
+                                        <goal>prepare-agent</goal>
+                                </goals>
+                        </execution>
+                        <!-- attached to Maven test phase -->
+                        <execution>
+                                <id>report</id>
+                                <phase>test</phase>
+                                <goals>
+                                        <goal>report</goal>
+                                </goals>
+                        </execution>
+                </executions>
+            </plugin>
+        </plugins>
+
 	</build>
 
 
@@ -209,7 +232,7 @@
 					<ignoreAnnotations>true</ignoreAnnotations>
 					<includeTests>true</includeTests>
 					<rulesets>
-						<ruleset>/usr/local/toolchain/pmd_rules.xml</ruleset>
+						<ruleset>pmd_rules.xml</ruleset>
 					</rulesets>
 				</configuration>
 			</plugin>
