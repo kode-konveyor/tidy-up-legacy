@@ -7,7 +7,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -22,15 +21,14 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 public class WorkRequestTest {
 	private static final String USER_PASSWORD_ENCODED = "userpasswordencoded";
 	private static final String USER_EMAIL = "nobody@nowhere.com";
-	private static final long _42L = 42L;
-	private static final long _41L = 41L;
+	private static final long USER_IDENTIFIER = 42L;
+	private static final long OTHER_USER_IDENTIFIER = 41L;
 	private TidyUserRepository tidyUserRepository = Mockito.mock(TidyUserRepository.class);
 	private WorkRequestRepository workRequestRepository = Mockito.mock(WorkRequestRepository.class);
 
@@ -47,29 +45,29 @@ public class WorkRequestTest {
 		WorkRequest request = new WorkRequest();
 		request.setCity(CITY);
 		request.setDescription(REQUEST_DESCRIPTION);
-		request.setId(_42L);
+		request.setIdentifier(USER_IDENTIFIER);
 		request.setUser(user);
 		return request;
 	}
 
 	@Test
 	void getForUser() {
-		when(tidyUserRepository.findById(_42L)).thenReturn(user());
-		ResponseEntity<WorkRequestResource> response = workRequestController.get(_42L,user().get().getWorkRequests().iterator().next().getId());
+		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(user());
+		ResponseEntity<WorkRequestResource> response = workRequestController.get(USER_IDENTIFIER,user().get().getWorkRequests().iterator().next().getIdentifier());
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-		assertThrows(WorkRequestNotFoundException.class, () -> { workRequestController.get(_42L,user().get().getWorkRequests().iterator().next().getId()+1L); });
+		assertThrows(WorkRequestNotFoundException.class, () -> { workRequestController.get(USER_IDENTIFIER,user().get().getWorkRequests().iterator().next().getIdentifier()+1L); });
 	}
 	
 	@Test
 	void getForNonExistentUser() {
-		when(tidyUserRepository.findById(_42L)).thenReturn(Optional.empty());
-		assertThrows(TidyUserNotFoundException.class, () -> { workRequestController.get(_42L,user().get().getWorkRequests().iterator().next().getId()); });
+		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(Optional.empty());
+		assertThrows(TidyUserNotFoundException.class, () -> { workRequestController.get(USER_IDENTIFIER,user().get().getWorkRequests().iterator().next().getIdentifier()); });
 	}
 
 	@Test
 	void getNonExistentForUser() {
-		when(tidyUserRepository.findById(_42L)).thenReturn(Optional.empty());
-		assertThrows(TidyUserNotFoundException.class, () -> { workRequestController.get(_42L,user().get().getWorkRequests().iterator().next().getId()+1L); });
+		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(Optional.empty());
+		assertThrows(TidyUserNotFoundException.class, () -> { workRequestController.get(USER_IDENTIFIER,user().get().getWorkRequests().iterator().next().getIdentifier()+1L); });
 	}
 	
 	@Test
@@ -77,8 +75,8 @@ public class WorkRequestTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
         
-		when(tidyUserRepository.findById(_42L)).thenReturn(user());
-		ResponseEntity<Resources<WorkRequestResource>> response = workRequestController.all(_42L);
+		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(user());
+		ResponseEntity<Resources<WorkRequestResource>> response = workRequestController.all(USER_IDENTIFIER);
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 	}
 	
@@ -87,8 +85,8 @@ public class WorkRequestTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
-		when(tidyUserRepository.findById(_42L)).thenReturn(Optional.empty());
-		assertThrows(TidyUserNotFoundException.class, () -> { workRequestController.all(_42L); });
+		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(Optional.empty());
+		assertThrows(TidyUserNotFoundException.class, () -> { workRequestController.all(USER_IDENTIFIER); });
 	}
 	
 	@Test
@@ -107,7 +105,7 @@ public class WorkRequestTest {
 		MockHttpServletRequest request = new MockHttpServletRequest();
 		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
-		when(tidyUserRepository.findById(_42L)).thenReturn(user());
+		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(user());
 		when(tidyUserRepository.findByEmail(USER_EMAIL)).thenReturn(user());
 		when(workRequestRepository.save(Mockito.any())).thenReturn(user().get().getWorkRequests().iterator().next());
 
@@ -119,14 +117,14 @@ public class WorkRequestTest {
 		when(securityContext.getAuthentication()).thenReturn(authentication);
 		SecurityContextHolder.setContext(securityContext);
 
-		ResponseEntity<WorkRequestResource> response = workRequestController.post(_42L, requestDto());
+		ResponseEntity<WorkRequestResource> response = workRequestController.post(USER_IDENTIFIER, requestDto());
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 		
-		ResponseEntity<WorkRequestResource> responseOther = workRequestController.post(_41L, requestDto());
+		ResponseEntity<WorkRequestResource> responseOther = workRequestController.post(OTHER_USER_IDENTIFIER, requestDto());
 		assertThat(responseOther.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
 		
-		when(tidyUserRepository.findById(_42L)).thenReturn(Optional.empty());
-		assertThrows(TidyUserNotFoundException.class, () -> { workRequestController.post(_42L, requestDto()); });
+		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(Optional.empty());
+		assertThrows(TidyUserNotFoundException.class, () -> { workRequestController.post(USER_IDENTIFIER, requestDto()); });
 	}
 
 	@Test
@@ -134,7 +132,7 @@ public class WorkRequestTest {
 		MockHttpServletRequest request = new MockHttpServletRequest();
 		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
-		when(tidyUserRepository.findById(_42L)).thenReturn(user());
+		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(user());
 		when(tidyUserRepository.findByEmail(USER_EMAIL)).thenReturn(user());
 		when(workRequestRepository.save(Mockito.any())).thenReturn(user().get().getWorkRequests().iterator().next());
 
@@ -147,14 +145,14 @@ public class WorkRequestTest {
 		SecurityContextHolder.setContext(securityContext);
 
 		
-		ResponseEntity<WorkRequestResource> response = workRequestController.put(_42L, user().get().getWorkRequests().iterator().next().getId(), requestDto());
+		ResponseEntity<WorkRequestResource> response = workRequestController.put(USER_IDENTIFIER, user().get().getWorkRequests().iterator().next().getIdentifier(), requestDto());
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 		
-		ResponseEntity<WorkRequestResource> responseOther = workRequestController.put(_41L, user().get().getWorkRequests().iterator().next().getId(), requestDto());
+		ResponseEntity<WorkRequestResource> responseOther = workRequestController.put(OTHER_USER_IDENTIFIER, user().get().getWorkRequests().iterator().next().getIdentifier(), requestDto());
 		assertThat(responseOther.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
 		
-		when(tidyUserRepository.findById(_42L)).thenReturn(Optional.empty());
-		assertThrows(TidyUserNotFoundException.class, () -> { workRequestController.put(_42L, user().get().getWorkRequests().iterator().next().getId(), requestDto()); });
+		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(Optional.empty());
+		assertThrows(TidyUserNotFoundException.class, () -> { workRequestController.put(USER_IDENTIFIER, user().get().getWorkRequests().iterator().next().getIdentifier(), requestDto()); });
 	}
 
 	@Test
@@ -162,7 +160,7 @@ public class WorkRequestTest {
 		MockHttpServletRequest request = new MockHttpServletRequest();
 		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
-		when(tidyUserRepository.findById(_42L)).thenReturn(user());
+		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(user());
 		when(tidyUserRepository.findByEmail(USER_EMAIL)).thenReturn(user());
 		when(workRequestRepository.save(Mockito.any())).thenReturn(user().get().getWorkRequests().iterator().next());
 
@@ -175,22 +173,22 @@ public class WorkRequestTest {
 		SecurityContextHolder.setContext(securityContext);
 
 		
-		ResponseEntity<?> response = workRequestController.delete(_42L, user().get().getWorkRequests().iterator().next().getId());
+		ResponseEntity<?> response = workRequestController.delete(USER_IDENTIFIER, user().get().getWorkRequests().iterator().next().getIdentifier());
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 		
-		ResponseEntity<?> responseOther = workRequestController.delete(_41L, user().get().getWorkRequests().iterator().next().getId());
+		ResponseEntity<?> responseOther = workRequestController.delete(OTHER_USER_IDENTIFIER, user().get().getWorkRequests().iterator().next().getIdentifier());
 		assertThat(responseOther.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
-		assertThrows(WorkRequestNotFoundException.class, () -> { workRequestController.delete(_42L,user().get().getWorkRequests().iterator().next().getId()+1L); });
+		assertThrows(WorkRequestNotFoundException.class, () -> { workRequestController.delete(USER_IDENTIFIER,user().get().getWorkRequests().iterator().next().getIdentifier()+1L); });
 		
-		when(tidyUserRepository.findById(_42L)).thenReturn(Optional.empty());
-		assertThrows(TidyUserNotFoundException.class, () -> { workRequestController.delete(_42L, user().get().getWorkRequests().iterator().next().getId()); });
+		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(Optional.empty());
+		assertThrows(TidyUserNotFoundException.class, () -> { workRequestController.delete(USER_IDENTIFIER, user().get().getWorkRequests().iterator().next().getIdentifier()); });
 	}
 
 	
 	private Role role() {
 		Role role = new Role();
 		role.setName(roleDto().toString());
-		role.setId(_42L);
+		role.setIdentifier(USER_IDENTIFIER);
 		return role;
 	}
 
@@ -200,7 +198,7 @@ public class WorkRequestTest {
 
 	private Optional<TidyUser> user() {
 		TidyUser user = new TidyUser();
-		user.setId(_42L);
+		user.setIdentifier(USER_IDENTIFIER);
 		user.setEmail(USER_EMAIL);
 		user.setPassword(USER_PASSWORD_ENCODED);
 		user.setRoles(new ArrayList<Role>(Arrays.asList(role())));

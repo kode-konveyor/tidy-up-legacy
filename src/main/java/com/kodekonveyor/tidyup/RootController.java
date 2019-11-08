@@ -9,6 +9,5 @@ public class RootController {
 	@GetMapping("/")
 	public ResponseEntity<RootResource> root() {
 		return ResponseEntity.ok(new RootResource());
-
 	}
 }

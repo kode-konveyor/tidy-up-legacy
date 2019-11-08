@@ -6,7 +6,6 @@ import org.springframework.hateoas.Resources;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -22,16 +21,18 @@ import javax.validation.Valid;
 @RequestMapping(value = "/users", produces = "application/hal+json")
 public class TidyUserController {
 
-	@Autowired
-	TidyUserRepository tidyUserRepository;
+	private static final String SLASH_ID_PARAMETER = "/{id}";
 
 	@Autowired
-	RoleRepository roleRepository;
+	private TidyUserRepository tidyUserRepository;
+
+	@Autowired
+	private RoleRepository roleRepository;
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
-	public TidyUserController(TidyUserRepository tidyUserRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+	public TidyUserController(final TidyUserRepository tidyUserRepository, final RoleRepository roleRepository, final PasswordEncoder passwordEncoder) {
 		this.tidyUserRepository = tidyUserRepository;
 		this.roleRepository = roleRepository;
 		this.passwordEncoder = passwordEncoder;
@@ -47,10 +48,10 @@ public class TidyUserController {
 		return ResponseEntity.ok(resources);
 	}
 
-	@GetMapping("/{id}")
-	public ResponseEntity<TidyUserResource> get(@PathVariable final long id) {
-		return tidyUserRepository.findById(id).map(p -> ResponseEntity.ok(new TidyUserResource(p)))
-				.orElseThrow(() -> new TidyUserNotFoundException(id));
+	@GetMapping(SLASH_ID_PARAMETER)
+	public ResponseEntity<TidyUserResource> get(@PathVariable final long identifier) {
+		return tidyUserRepository.findById(identifier).map(p -> ResponseEntity.ok(new TidyUserResource(p)))
+				.orElseThrow(() -> new TidyUserNotFoundException(identifier));
 	}
 
 	@PostMapping
@@ -67,25 +68,25 @@ public class TidyUserController {
 		userToRegister.setWorkRequests(new ArrayList<WorkRequest>());
 
 		final TidyUser user = tidyUserRepository.save(userToRegister);
-		final Long id = user.getId();
+		final Long id = user.getIdentifier();
 		final URI uri = ServletUriComponentsBuilder
 				.fromCurrentRequest()
-				.path("/{id}")
+				.path(SLASH_ID_PARAMETER)
 				.buildAndExpand(id)
 				.toUri();
 		return ResponseEntity.created(uri).body(new TidyUserResource(user));
 	}
 
-	@PutMapping("/{id}")
-	public ResponseEntity<TidyUserResource> put(@PathVariable("id") final long id,
-			@RequestBody TidyUserDto tidyUserFromRequest) {
+	@PutMapping(SLASH_ID_PARAMETER)
+	public ResponseEntity<TidyUserResource> put(@PathVariable("id") final long identifier,
+			@RequestBody final TidyUserDto tidyUserFromRequest) {
 		Role role = roleRepository.findByName(tidyUserFromRequest.getRole().toString());
 		TidyUser user = new TidyUser();
 		user.setEmail(tidyUserFromRequest.getEmail());
 		user.setPassword(passwordEncoder.encode(tidyUserFromRequest.getPassword()));
 		user.setRoles(new ArrayList<Role>(Arrays.asList(role)));
 		user.setWorkRequests(new ArrayList<WorkRequest>());
-		user.setId(id);
+		user.setIdentifier(identifier);
 
 		final TidyUser person = tidyUserRepository.save(user);
 
@@ -94,11 +95,11 @@ public class TidyUserController {
 		return ResponseEntity.created(uri).body(resource);
 	}
 
-	@DeleteMapping("/{id}")
-	public ResponseEntity<?> delete(@PathVariable("id") final long id) {
-		return tidyUserRepository.findById(id).map(p -> {
-			tidyUserRepository.deleteById(id);
+	@DeleteMapping(SLASH_ID_PARAMETER)
+	public ResponseEntity<?> delete(@PathVariable("id") final long identifier) {
+		return tidyUserRepository.findById(identifier).map(p -> {
+			tidyUserRepository.deleteById(identifier);
 			return ResponseEntity.noContent().build();
-		}).orElseThrow(() -> new TidyUserNotFoundException(id));
+		}).orElseThrow(() -> new TidyUserNotFoundException(identifier));
 	}
 }

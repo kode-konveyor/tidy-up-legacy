@@ -9,6 +9,7 @@ public class RootResource extends ResourceSupport {
 	private static final String ALL_USERS = "all-users";
 
 	public RootResource() {
+		super();
 		add(linkTo(TidyUserController.class).withRel(ALL_USERS));
 		add(linkTo(methodOn(RootController.class).root()).withSelfRel());
 	}

@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Controller
-public class AuthenticatedTestController {
-	@GetMapping("/test")
+public class PrincipalReturningController {
+	@GetMapping("/principal")
 	@ResponseStatus(value = HttpStatus.OK)
-	public @ResponseBody String test() {
+	public @ResponseBody String getPrincipal() {
 		return SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
 	}
 }

@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
@@ -34,7 +33,7 @@ public class WorkRequestController {
 	@Autowired
 	private WorkRequestRepository workRequestRepository;
 	
-	public WorkRequestController (TidyUserRepository tidyUserRepository, WorkRequestRepository workRequestRepository) {
+	public WorkRequestController (final TidyUserRepository tidyUserRepository, final WorkRequestRepository workRequestRepository) {
 		this.tidyUserRepository = tidyUserRepository;
 		this.workRequestRepository = workRequestRepository;
 	}
@@ -73,7 +72,7 @@ public class WorkRequestController {
 						p -> p
 						.getWorkRequests()
 						.stream()
-						.filter(m -> m.getId().equals(workRequestId))
+						.filter(m -> m.getIdentifier().equals(workRequestId))
 						.findAny()
 						.map(m -> ResponseEntity.ok(new WorkRequestResource(m)))
 						.orElseThrow(() -> new WorkRequestNotFoundException(workRequestId)))
@@ -84,7 +83,7 @@ public class WorkRequestController {
 	public ResponseEntity<WorkRequestResource> post(@PathVariable final long userId,
 			@RequestBody final WorkRequestDto inputRequest) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if (tidyUserRepository.findByEmail(user.getUsername()).get().getId() != userId)
+		if (tidyUserRepository.findByEmail(user.getUsername()).get().getIdentifier() != userId)
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 
 		return tidyUserRepository.findById(userId).map(p -> {
@@ -102,7 +101,7 @@ public class WorkRequestController {
 		return ServletUriComponentsBuilder
 				.fromCurrentRequest()
 				.path("/{workRequestId}")
-				.buildAndExpand(workRequest.getUser().getId(), workRequest.getId())
+				.buildAndExpand(workRequest.getUser().getIdentifier(), workRequest.getIdentifier())
 				.toUri();
 	}
 
@@ -110,14 +109,14 @@ public class WorkRequestController {
 	public ResponseEntity<WorkRequestResource> put(@PathVariable final long userId,
 			@PathVariable final long workRequestId, @RequestBody final WorkRequestDto inputRequest) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if (tidyUserRepository.findByEmail(user.getUsername()).get().getId() != userId)
+		if (tidyUserRepository.findByEmail(user.getUsername()).get().getIdentifier() != userId)
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		return tidyUserRepository.findById(userId).map(p -> {
 			WorkRequest requestToSave = new WorkRequest();
 			requestToSave.setCity(inputRequest.getCity());
 			requestToSave.setDescription(inputRequest.getDescription());
 			requestToSave.setUser(p);
-			requestToSave.setId(workRequestId);
+			requestToSave.setIdentifier(workRequestId);
 			WorkRequest request = workRequestRepository.save(requestToSave);
 			final URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentRequest().toUriString());
 			return ResponseEntity.created(uri).body(new WorkRequestResource(request));
@@ -127,10 +126,10 @@ public class WorkRequestController {
 	@DeleteMapping("/users/{userId}/workrequests/{workRequestId}")
 	public ResponseEntity<?> delete(@PathVariable final long userId, @PathVariable final long workRequestId) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if (tidyUserRepository.findByEmail(user.getUsername()).get().getId() != userId)
+		if (tidyUserRepository.findByEmail(user.getUsername()).get().getIdentifier() != userId)
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		return tidyUserRepository.findById(userId)
-				.map(p -> p.getWorkRequests().stream().filter(m -> m.getId().equals(workRequestId)).findAny().map(m -> {
+				.map(p -> p.getWorkRequests().stream().filter(m -> m.getIdentifier().equals(workRequestId)).findAny().map(m -> {
 					workRequestRepository.delete(m);
 					return ResponseEntity.noContent().build();
 				}).orElseThrow(() -> new WorkRequestNotFoundException(workRequestId)))

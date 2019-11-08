@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface TidyUserRepository extends JpaRepository<TidyUser, Long> {
 	Optional<TidyUser> findByEmail(String email);
 
-	Optional<TidyUser> findById(long id);
+	Optional<TidyUser> findById(long identifier);
 }

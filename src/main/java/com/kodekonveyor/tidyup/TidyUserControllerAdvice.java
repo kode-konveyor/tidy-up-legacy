@@ -12,8 +12,8 @@ import java.util.Optional;
 @RequestMapping(produces = "application/vnd.error+json")
 public class TidyUserControllerAdvice extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(TidyUserNotFoundException.class)
-	public ResponseEntity<VndErrors> notFoundException(final TidyUserNotFoundException e) {
-		return error(e, HttpStatus.NOT_FOUND, e.getId().toString());
+	public ResponseEntity<VndErrors> notFoundException(final TidyUserNotFoundException exception) {
+		return error(exception, HttpStatus.NOT_FOUND, exception.getIdentifier().toString());
 	}
 
 	private ResponseEntity<VndErrors> error(final Exception exception, final HttpStatus httpStatus,
@@ -23,14 +23,14 @@ public class TidyUserControllerAdvice extends ResponseEntityExceptionHandler {
 	}
 
 	@ExceptionHandler(IllegalArgumentException.class)
-	public ResponseEntity<VndErrors> assertionException(final IllegalArgumentException e) {
-		return error(e, HttpStatus.NOT_FOUND, e.getLocalizedMessage());
+	public ResponseEntity<VndErrors> assertionException(final IllegalArgumentException exception) {
+		return error(exception, HttpStatus.NOT_FOUND, exception.getLocalizedMessage());
 
 	}
 
 	@ExceptionHandler(TidyUserAlreadyRegisteredException.class)
-	public ResponseEntity<VndErrors> alreadyRegistered(final TidyUserAlreadyRegisteredException e) {
-		return error(e, HttpStatus.CONFLICT, e.getEmail());
+	public ResponseEntity<VndErrors> alreadyRegistered(final TidyUserAlreadyRegisteredException exception) {
+		return error(exception, HttpStatus.CONFLICT, exception.getEmail());
 	}
 
 }

@@ -24,10 +24,10 @@ public class TidyUserTest {
 	private static final String USER_PASSWORD = "userpassword";
 	private static final String USER_PASSWORD_ENCODED = "userpasswordencoded";
 	private static final String USER_EMAIL = "nobody@nowhere.com";
-	private static final long _42L = 42L;
-	private TidyUserRepository tidyUserRepository = Mockito.mock(TidyUserRepository.class);
-	private RoleRepository roleRepository = Mockito.mock(RoleRepository.class);
-	private PasswordEncoder passwordEncoder = Mockito.mock(PasswordEncoder.class);
+	private static final long USER_IDENTIFIER = 42L;
+	private final TidyUserRepository tidyUserRepository = Mockito.mock(TidyUserRepository.class);
+	private final RoleRepository roleRepository = Mockito.mock(RoleRepository.class);
+	private final PasswordEncoder passwordEncoder = Mockito.mock(PasswordEncoder.class);
 
 	private TidyUserController tidyUserController;
 
@@ -42,15 +42,15 @@ public class TidyUserTest {
 		WorkRequest request = new WorkRequest();
 		request.setCity(CITY);
 		request.setDescription(REQUEST_DESCRIPTION);
-		request.setId(_42L);
+		request.setIdentifier(USER_IDENTIFIER);
 		request.setUser(user);
 		return request;
 	}
 
 	@Test
 	void registeredUserGetsItself() {
-		when(tidyUserRepository.findById(_42L)).thenReturn(user());
-		ResponseEntity<TidyUserResource> response = tidyUserController.get(_42L);
+		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(user());
+		ResponseEntity<TidyUserResource> response = tidyUserController.get(USER_IDENTIFIER);
 
 		assertThat(response).isNotNull();
 		assertThat(response.getBody()).isEqualTo(new TidyUserResource(user().get()));
@@ -59,8 +59,8 @@ public class TidyUserTest {
 	
 	@Test
 	void notRegisteredUserGetFails() {
-		when(tidyUserRepository.findById(_42L)).thenReturn(Optional.empty());
-		assertThrows(TidyUserNotFoundException.class, () -> { tidyUserController.get(_42L); });
+		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(Optional.empty());
+		assertThrows(TidyUserNotFoundException.class, () -> { tidyUserController.get(USER_IDENTIFIER); });
 	}
 	
 	@Test
@@ -92,7 +92,7 @@ public class TidyUserTest {
         
 		when(roleRepository.findByName(roleDto().toString())).thenReturn(role());
 		when(tidyUserRepository.save(Mockito.any())).thenReturn(user().get());
-		ResponseEntity<TidyUserResource> response = tidyUserController.put(_42L,userdto());
+		ResponseEntity<TidyUserResource> response = tidyUserController.put(USER_IDENTIFIER,userdto());
 		assertThat(response).isNotNull();
 		assertThat(response.getBody()).isEqualTo(new TidyUserResource(user().get()));
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -100,17 +100,17 @@ public class TidyUserTest {
 	
 	@Test
 	void delete() {
-		when(tidyUserRepository.findById(_42L)).thenReturn(user());
+		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(user());
 		
-		ResponseEntity<?> response = tidyUserController.delete(_42L);
+		ResponseEntity<?> response = tidyUserController.delete(USER_IDENTIFIER);
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 	}
 	
 	@Test
 	void deleteMissing() {
-		when(tidyUserRepository.findById(_42L)).thenReturn(Optional.empty());
+		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(Optional.empty());
 		
-		assertThrows(TidyUserNotFoundException.class, () -> { tidyUserController.delete(_42L); });
+		assertThrows(TidyUserNotFoundException.class, () -> { tidyUserController.delete(USER_IDENTIFIER); });
 	}
 	
 	@Test
@@ -125,7 +125,7 @@ public class TidyUserTest {
 	private Role role() {
 		Role role = new Role();
 		role.setName(roleDto().toString());
-		role.setId(_42L);
+		role.setIdentifier(USER_IDENTIFIER);
 		return role;
 	}
 
@@ -143,7 +143,7 @@ public class TidyUserTest {
 
 	private Optional<TidyUser> user() {
 		TidyUser user = new TidyUser();
-		user.setId(_42L);
+		user.setIdentifier(USER_IDENTIFIER);
 		user.setEmail(USER_EMAIL);
 		user.setPassword(USER_PASSWORD_ENCODED);
 		user.setRoles(new ArrayList<Role>(Arrays.asList(role())));

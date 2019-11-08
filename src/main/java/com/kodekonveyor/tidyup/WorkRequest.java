@@ -8,9 +8,7 @@ import javax.persistence.ManyToOne;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Data
 @Entity
@@ -18,7 +16,7 @@ import lombok.Setter;
 public class WorkRequest {
 	@Id
 	@GeneratedValue
-	private Long id;
+	private Long identifier;
 
 	private String city;
 	private String description;

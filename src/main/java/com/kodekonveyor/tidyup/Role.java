@@ -8,9 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Data
 @Entity
@@ -18,7 +16,7 @@ import lombok.Setter;
 public class Role {
 	@Id
 	@GeneratedValue
-	private Long id;
+	private Long identifier;
 	private String name;
 
 	@ManyToMany(mappedBy = "roles")

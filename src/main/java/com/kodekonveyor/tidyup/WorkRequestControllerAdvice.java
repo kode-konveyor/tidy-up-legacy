@@ -14,8 +14,8 @@ import java.util.Optional;
 public class WorkRequestControllerAdvice {
 
 	@ExceptionHandler(WorkRequestNotFoundException.class)
-	public ResponseEntity<VndErrors> notFoundException(WorkRequestNotFoundException e) {
-		return error(e, HttpStatus.NOT_FOUND, String.valueOf(e.getId()));
+	public ResponseEntity<VndErrors> notFoundException(final WorkRequestNotFoundException exception) {
+		return error(exception, HttpStatus.NOT_FOUND, String.valueOf(exception.getIdentifier()));
 	}
 
 	private <E extends Exception> ResponseEntity<VndErrors> error(final E exception, final HttpStatus httpStatus,
