@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class SetupDataLoader implements ApplicationListener<ContextRefreshedEvent> {
-	private boolean alreadySetup = false;
+	private boolean alreadySetup;
 
 	@Autowired
 	private TidyUserRepository userRepository;
@@ -30,7 +30,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
 	@Override
 	public void onApplicationEvent(final ContextRefreshedEvent event) {
-		if (!alreadySetup) {
+		if (!this.alreadySetup) {
 			// == create initial privileges
 			// TODO
 			final Privilege customerPrivilege = createPrivilegeIfNotFound("CUSTOMER_PRIVILEGE");
@@ -45,16 +45,16 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 					Arrays.asList(workerPrivilege, genericUserPrivilege));
 			final List<Privilege> adminPrivileges = new ArrayList<>(
 					Arrays.asList(workerPrivilege, customerPrivilege, genericUserPrivilege, adminPrivilege));
-			final Role customerRole = createRoleIfNotFound(RoleDto.CUSTOMER.toString(), customerPrivileges);
-			final Role workerRole = createRoleIfNotFound(RoleDto.WORKER.toString(), workerPrivileges);
-			final Role adminRole = createRoleIfNotFound("ADMIN", adminPrivileges);
+			final UserRole customerRole = createRoleIfNotFound(RoleDto.CUSTOMER.toString(), customerPrivileges);
+			final UserRole workerRole = createRoleIfNotFound(RoleDto.WORKER.toString(), workerPrivileges);
+			final UserRole adminRole = createRoleIfNotFound("ADMIN", adminPrivileges);
 
 			// == create initial user
-			createUserIfNotFound("worker@test.com", "test", new ArrayList<Role>(Arrays.asList(workerRole)));
-			createUserIfNotFound("customer@test.com", "test", new ArrayList<Role>(Arrays.asList(customerRole)));
-			createUserIfNotFound("admin@test.com", "test", new ArrayList<Role>(Arrays.asList(adminRole)));
+			createUserIfNotFound("worker@test.com", "test", new ArrayList<UserRole>(Arrays.asList(workerRole)));
+			createUserIfNotFound("customer@test.com", "test", new ArrayList<UserRole>(Arrays.asList(customerRole)));
+			createUserIfNotFound("admin@test.com", "test", new ArrayList<UserRole>(Arrays.asList(adminRole)));
 
-			alreadySetup = true;
+			this.alreadySetup = true;
 		}
 	}
 
@@ -70,10 +70,10 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 	}
 
 	@Transactional
-	private Role createRoleIfNotFound(final String name, final Collection<Privilege> privileges) {
-		Role role = roleRepository.findByName(name);
+	private UserRole createRoleIfNotFound(final String name, final Collection<Privilege> privileges) {
+		UserRole role = roleRepository.findByName(name);
 		if (role == null) {
-			role = new Role();
+			role = new UserRole();
 			role.setName(name);
 		}
 		role.setPrivileges(privileges);
@@ -83,7 +83,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
 	@Transactional
 	private TidyUser createUserIfNotFound(final String email, final String password,
-			final Collection<Role> roles) {
+			final Collection<UserRole> roles) {
 		TidyUser user = userRepository.findByEmail(email).map(u -> u).orElseGet(() -> {
 			TidyUser newUser = new TidyUser();
 			newUser.setPassword(passwordEncoder.encode(password));

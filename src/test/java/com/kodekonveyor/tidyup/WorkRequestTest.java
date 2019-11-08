@@ -51,33 +51,32 @@ public class WorkRequestTest {
 	}
 
 	@Test
-	public void getForUserOk() {
+	public void forUserOk() {
 		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(user());
 		ResponseEntity<WorkRequestResource> response = workRequestController.get(USER_IDENTIFIER,user().get().getWorkRequests().iterator().next().getIdentifier());
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 	}
 
 	@Test
-	public void getForUserNotFound() {
+	public void forUserNotFound() {
 		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(user());
-		ResponseEntity<WorkRequestResource> response = workRequestController.get(USER_IDENTIFIER,user().get().getWorkRequests().iterator().next().getIdentifier());
 		assertThrows(WorkRequestNotFoundException.class, () -> { workRequestController.get(USER_IDENTIFIER,user().get().getWorkRequests().iterator().next().getIdentifier()+1L); });
 	}
 	
 	@Test
-	public void getForNonExistentUser() {
+	public void forNonExistentUser() {
 		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(Optional.empty());
 		assertThrows(TidyUserNotFoundException.class, () -> { workRequestController.get(USER_IDENTIFIER,user().get().getWorkRequests().iterator().next().getIdentifier()); });
 	}
 
 	@Test
-	public void getNonExistentForUser() {
+	public void nonExistentForUser() {
 		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(Optional.empty());
 		assertThrows(TidyUserNotFoundException.class, () -> { workRequestController.get(USER_IDENTIFIER,user().get().getWorkRequests().iterator().next().getIdentifier()+1L); });
 	}
 	
 	@Test
-	public void getAllForUser() {
+	public void allForUser() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
         
@@ -87,7 +86,7 @@ public class WorkRequestTest {
 	}
 	
 	@Test
-	public void getAllForNonExistentUser() {
+	public void allForNonExistentUser() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
@@ -96,7 +95,7 @@ public class WorkRequestTest {
 	}
 	
 	@Test
-	public void getAllForCity() {
+	public void allForCity() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
@@ -317,8 +316,8 @@ public class WorkRequestTest {
 	}
 
 	
-	private Role role() {
-		Role role = new Role();
+	private UserRole role() {
+		UserRole role = new UserRole();
 		role.setName(roleDto().toString());
 		role.setIdentifier(USER_IDENTIFIER);
 		return role;
@@ -333,7 +332,7 @@ public class WorkRequestTest {
 		user.setIdentifier(USER_IDENTIFIER);
 		user.setEmail(USER_EMAIL);
 		user.setPassword(USER_PASSWORD_ENCODED);
-		user.setRoles(new ArrayList<Role>(Arrays.asList(role())));
+		user.setRoles(new ArrayList<UserRole>(Arrays.asList(role())));
 		user.setWorkRequests(new ArrayList<WorkRequest>(Arrays.asList(workRequest(user))));
 		return Optional.of(user);
 	}

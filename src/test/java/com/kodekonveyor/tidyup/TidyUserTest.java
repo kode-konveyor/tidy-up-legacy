@@ -38,7 +38,7 @@ public class TidyUserTest {
 	
 	private static final String CITY = "CITY";
 	private static final String REQUEST_DESCRIPTION = "want my space to be tidy";
-	private WorkRequest workRequest(TidyUser user) {
+	private WorkRequest workRequest(final TidyUser user) {
 		WorkRequest request = new WorkRequest();
 		request.setCity(CITY);
 		request.setDescription(REQUEST_DESCRIPTION);
@@ -133,22 +133,22 @@ public class TidyUserTest {
 	}
 	
 	@Test
-	public void getAll() {
+	public void allTest() {
 		when(tidyUserRepository.findAll()).thenReturn(new ArrayList<TidyUser>(Arrays.asList(user().get())));
 		ResponseEntity<Resources<TidyUserResource>> response = tidyUserController.all();
 		assertThat(response.getBody().getContent().size()).isEqualTo(1);
 	}
 	
 	@Test
-	public void getAllStatus() {
+	public void allStatus() {
 		when(tidyUserRepository.findAll()).thenReturn(new ArrayList<TidyUser>(Arrays.asList(user().get())));
 		ResponseEntity<Resources<TidyUserResource>> response = tidyUserController.all();
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 	}
 	
 	
-	private Role role() {
-		Role role = new Role();
+	private UserRole role() {
+		UserRole role = new UserRole();
 		role.setName(roleDto().toString());
 		role.setIdentifier(USER_IDENTIFIER);
 		return role;
@@ -171,7 +171,7 @@ public class TidyUserTest {
 		user.setIdentifier(USER_IDENTIFIER);
 		user.setEmail(USER_EMAIL);
 		user.setPassword(USER_PASSWORD_ENCODED);
-		user.setRoles(new ArrayList<Role>(Arrays.asList(role())));
+		user.setRoles(new ArrayList<UserRole>(Arrays.asList(role())));
 		user.setWorkRequests(new ArrayList<WorkRequest>(Arrays.asList(workRequest(user))));
 		return Optional.of(user);
 	}

@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @NoArgsConstructor
-public class Role {
+public class UserRole {
 	@Id
 	@GeneratedValue
 	private Long identifier;

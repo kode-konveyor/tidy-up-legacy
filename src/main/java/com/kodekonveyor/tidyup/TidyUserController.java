@@ -24,13 +24,13 @@ public class TidyUserController {
 	private static final String SLASH_ID_PARAMETER = "/{id}";
 
 	@Autowired
-	private TidyUserRepository tidyUserRepository;
+	private final TidyUserRepository tidyUserRepository;
 
 	@Autowired
-	private RoleRepository roleRepository;
+	private final RoleRepository roleRepository;
 
 	@Autowired
-	private PasswordEncoder passwordEncoder;
+	private final PasswordEncoder passwordEncoder;
 
 	public TidyUserController(final TidyUserRepository tidyUserRepository, final RoleRepository roleRepository, final PasswordEncoder passwordEncoder) {
 		this.tidyUserRepository = tidyUserRepository;
@@ -60,19 +60,19 @@ public class TidyUserController {
 		if (already.isPresent())
 			throw new TidyUserAlreadyRegisteredException(already.get().getEmail());
 
-		Role role = roleRepository.findByName(tidyUserFromRequest.getRole().toString());
+		UserRole role = roleRepository.findByName(tidyUserFromRequest.getRole().toString());
 		TidyUser userToRegister = new TidyUser();
 		userToRegister.setEmail(tidyUserFromRequest.getEmail());
 		userToRegister.setPassword(passwordEncoder.encode(tidyUserFromRequest.getPassword()));
-		userToRegister.setRoles(new ArrayList<Role>(Arrays.asList(role)));
+		userToRegister.setRoles(new ArrayList<UserRole>(Arrays.asList(role)));
 		userToRegister.setWorkRequests(new ArrayList<WorkRequest>());
 
 		final TidyUser user = tidyUserRepository.save(userToRegister);
-		final Long id = user.getIdentifier();
+		final Long identifier = user.getIdentifier();
 		final URI uri = ServletUriComponentsBuilder
 				.fromCurrentRequest()
 				.path(SLASH_ID_PARAMETER)
-				.buildAndExpand(id)
+				.buildAndExpand(identifier)
 				.toUri();
 		return ResponseEntity.created(uri).body(new TidyUserResource(user));
 	}
@@ -80,11 +80,11 @@ public class TidyUserController {
 	@PutMapping(SLASH_ID_PARAMETER)
 	public ResponseEntity<TidyUserResource> put(@PathVariable("id") final long identifier,
 			@RequestBody final TidyUserDto tidyUserFromRequest) {
-		Role role = roleRepository.findByName(tidyUserFromRequest.getRole().toString());
+		UserRole role = roleRepository.findByName(tidyUserFromRequest.getRole().toString());
 		TidyUser user = new TidyUser();
 		user.setEmail(tidyUserFromRequest.getEmail());
 		user.setPassword(passwordEncoder.encode(tidyUserFromRequest.getPassword()));
-		user.setRoles(new ArrayList<Role>(Arrays.asList(role)));
+		user.setRoles(new ArrayList<UserRole>(Arrays.asList(role)));
 		user.setWorkRequests(new ArrayList<WorkRequest>());
 		user.setIdentifier(identifier);
 

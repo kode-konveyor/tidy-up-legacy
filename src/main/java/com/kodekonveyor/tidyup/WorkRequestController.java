@@ -28,10 +28,10 @@ public class WorkRequestController {
 	private static final String SELF = "self";
 
 	@Autowired
-	private TidyUserRepository tidyUserRepository;
+	private final TidyUserRepository tidyUserRepository;
 
 	@Autowired
-	private WorkRequestRepository workRequestRepository;
+	private final WorkRequestRepository workRequestRepository;
 	
 	public WorkRequestController (final TidyUserRepository tidyUserRepository, final WorkRequestRepository workRequestRepository) {
 		this.tidyUserRepository = tidyUserRepository;

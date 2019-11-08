@@ -1,6 +1,5 @@
 package com.kodekonveyor.tidyup;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,11 +31,11 @@ public class TidyUserDetailsService implements UserDetailsService {
 		return new User(user.getEmail(), user.getPassword(), true, true, true, true, getAuthorities(user.getRoles()));
 	}
 
-	private Collection<? extends GrantedAuthority> getAuthorities(final Collection<Role> roles) {
+	private Collection<? extends GrantedAuthority> getAuthorities(final Collection<UserRole> roles) {
 		return getGrantedAuthorities(getPrivileges(roles));
 	}
 
-	private List<String> getPrivileges(final Collection<Role> roles) {
+	private List<String> getPrivileges(final Collection<UserRole> roles) {
 		return roles.stream()
                 .flatMap(role -> role.getPrivileges().stream())
                 .map(Privilege::getName)

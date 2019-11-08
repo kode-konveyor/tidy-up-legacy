@@ -29,7 +29,7 @@ public class TidyUser {
 	private String password;
 
 	@ManyToMany
-	private Collection<Role> roles;
+	private Collection<UserRole> roles;
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
 	private Collection<WorkRequest> workRequests;

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @Controller
 public class PrincipalReturningController {
 	@GetMapping("/principal")
-	@ResponseStatus(value = HttpStatus.OK)
+	@ResponseStatus(HttpStatus.OK)
 	public @ResponseBody String getPrincipal() {
 		return SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
 	}
