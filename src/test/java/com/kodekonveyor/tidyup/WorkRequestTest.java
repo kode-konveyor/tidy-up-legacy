@@ -29,19 +29,19 @@ public class WorkRequestTest {
 	private static final String USER_EMAIL = "nobody@nowhere.com";
 	private static final long USER_IDENTIFIER = 42L;
 	private static final long OTHER_USER_IDENTIFIER = 41L;
-	private TidyUserRepository tidyUserRepository = Mockito.mock(TidyUserRepository.class);
-	private WorkRequestRepository workRequestRepository = Mockito.mock(WorkRequestRepository.class);
+	private static final String CITY = "CITY";
+	private static final String REQUEST_DESCRIPTION = "want my space to be tidy";
+	private final TidyUserRepository tidyUserRepository = Mockito.mock(TidyUserRepository.class);
+	private final WorkRequestRepository workRequestRepository = Mockito.mock(WorkRequestRepository.class);
 
 	private WorkRequestController workRequestController;
 
 	@BeforeEach
-	void setup() {
+	public void setUp() {
 		this.workRequestController = new WorkRequestController(tidyUserRepository, workRequestRepository);
 	}
 	
-	private static final String CITY = "CITY";
-	private static final String REQUEST_DESCRIPTION = "want my space to be tidy";
-	private WorkRequest workRequest(TidyUser user) {
+	private WorkRequest workRequest(final TidyUser user) {
 		WorkRequest request = new WorkRequest();
 		request.setCity(CITY);
 		request.setDescription(REQUEST_DESCRIPTION);

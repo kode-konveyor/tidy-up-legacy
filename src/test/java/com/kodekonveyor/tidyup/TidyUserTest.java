@@ -25,6 +25,8 @@ public class TidyUserTest {
 	private static final String USER_PASSWORD_ENCODED = "userpasswordencoded";
 	private static final String USER_EMAIL = "nobody@nowhere.com";
 	private static final long USER_IDENTIFIER = 42L;
+	private static final String CITY = "CITY";
+	private static final String REQUEST_DESCRIPTION = "want my space to be tidy";
 	private final TidyUserRepository tidyUserRepository = Mockito.mock(TidyUserRepository.class);
 	private final RoleRepository roleRepository = Mockito.mock(RoleRepository.class);
 	private final PasswordEncoder passwordEncoder = Mockito.mock(PasswordEncoder.class);
@@ -32,12 +34,10 @@ public class TidyUserTest {
 	private TidyUserController tidyUserController;
 
 	@BeforeEach
-	void setup() {
+	public void setUp() {
 		this.tidyUserController = new TidyUserController(tidyUserRepository, roleRepository, passwordEncoder);
 	}
 	
-	private static final String CITY = "CITY";
-	private static final String REQUEST_DESCRIPTION = "want my space to be tidy";
 	private WorkRequest workRequest(final TidyUser user) {
 		WorkRequest request = new WorkRequest();
 		request.setCity(CITY);
