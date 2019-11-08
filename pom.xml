@@ -232,7 +232,7 @@
 					<ignoreAnnotations>true</ignoreAnnotations>
 					<includeTests>true</includeTests>
 					<rulesets>
-						<ruleset>/build/pmd_rules.xml</ruleset>
+						<ruleset>pmd_rules.xml</ruleset>
 					</rulesets>
 				</configuration>
 			</plugin>
