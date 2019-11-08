@@ -51,27 +51,33 @@ public class WorkRequestTest {
 	}
 
 	@Test
-	void getForUser() {
+	public void getForUserOk() {
 		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(user());
 		ResponseEntity<WorkRequestResource> response = workRequestController.get(USER_IDENTIFIER,user().get().getWorkRequests().iterator().next().getIdentifier());
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+	}
+
+	@Test
+	public void getForUserNotFound() {
+		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(user());
+		ResponseEntity<WorkRequestResource> response = workRequestController.get(USER_IDENTIFIER,user().get().getWorkRequests().iterator().next().getIdentifier());
 		assertThrows(WorkRequestNotFoundException.class, () -> { workRequestController.get(USER_IDENTIFIER,user().get().getWorkRequests().iterator().next().getIdentifier()+1L); });
 	}
 	
 	@Test
-	void getForNonExistentUser() {
+	public void getForNonExistentUser() {
 		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(Optional.empty());
 		assertThrows(TidyUserNotFoundException.class, () -> { workRequestController.get(USER_IDENTIFIER,user().get().getWorkRequests().iterator().next().getIdentifier()); });
 	}
 
 	@Test
-	void getNonExistentForUser() {
+	public void getNonExistentForUser() {
 		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(Optional.empty());
 		assertThrows(TidyUserNotFoundException.class, () -> { workRequestController.get(USER_IDENTIFIER,user().get().getWorkRequests().iterator().next().getIdentifier()+1L); });
 	}
 	
 	@Test
-	void getAllForUser() {
+	public void getAllForUser() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
         
@@ -81,7 +87,7 @@ public class WorkRequestTest {
 	}
 	
 	@Test
-	void getAllForNonExistentUser() {
+	public void getAllForNonExistentUser() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
@@ -90,7 +96,7 @@ public class WorkRequestTest {
 	}
 	
 	@Test
-	void getAllForCity() {
+	public void getAllForCity() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
@@ -101,7 +107,28 @@ public class WorkRequestTest {
 	
 	
 	@Test
-	void create() {
+	public void createUserNotFound() {
+		MockHttpServletRequest request = new MockHttpServletRequest();
+		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+
+		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(user());
+		when(tidyUserRepository.findByEmail(USER_EMAIL)).thenReturn(user());
+		when(workRequestRepository.save(Mockito.any())).thenReturn(user().get().getWorkRequests().iterator().next());
+
+		User user = new User(USER_EMAIL,"",true,true,true,false,new ArrayList<GrantedAuthority>());
+		
+		Authentication authentication = Mockito.mock(Authentication.class);
+		when(authentication.getPrincipal()).thenReturn(user);
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		when(securityContext.getAuthentication()).thenReturn(authentication);
+		SecurityContextHolder.setContext(securityContext);
+
+		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(Optional.empty());
+		assertThrows(TidyUserNotFoundException.class, () -> { workRequestController.post(USER_IDENTIFIER, requestDto()); });
+	}
+	
+	@Test
+	public void createOk() {
 		MockHttpServletRequest request = new MockHttpServletRequest();
 		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
@@ -119,16 +146,31 @@ public class WorkRequestTest {
 
 		ResponseEntity<WorkRequestResource> response = workRequestController.post(USER_IDENTIFIER, requestDto());
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+	}
+	
+	@Test
+	public void createForbidden() {
+		MockHttpServletRequest request = new MockHttpServletRequest();
+		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+
+		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(user());
+		when(tidyUserRepository.findByEmail(USER_EMAIL)).thenReturn(user());
+		when(workRequestRepository.save(Mockito.any())).thenReturn(user().get().getWorkRequests().iterator().next());
+
+		User user = new User(USER_EMAIL,"",true,true,true,false,new ArrayList<GrantedAuthority>());
 		
+		Authentication authentication = Mockito.mock(Authentication.class);
+		when(authentication.getPrincipal()).thenReturn(user);
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		when(securityContext.getAuthentication()).thenReturn(authentication);
+		SecurityContextHolder.setContext(securityContext);
+
 		ResponseEntity<WorkRequestResource> responseOther = workRequestController.post(OTHER_USER_IDENTIFIER, requestDto());
 		assertThat(responseOther.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
-		
-		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(Optional.empty());
-		assertThrows(TidyUserNotFoundException.class, () -> { workRequestController.post(USER_IDENTIFIER, requestDto()); });
 	}
 
 	@Test
-	void put() {
+	public void putOk() {
 		MockHttpServletRequest request = new MockHttpServletRequest();
 		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
@@ -147,16 +189,10 @@ public class WorkRequestTest {
 		
 		ResponseEntity<WorkRequestResource> response = workRequestController.put(USER_IDENTIFIER, user().get().getWorkRequests().iterator().next().getIdentifier(), requestDto());
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-		
-		ResponseEntity<WorkRequestResource> responseOther = workRequestController.put(OTHER_USER_IDENTIFIER, user().get().getWorkRequests().iterator().next().getIdentifier(), requestDto());
-		assertThat(responseOther.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
-		
-		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(Optional.empty());
-		assertThrows(TidyUserNotFoundException.class, () -> { workRequestController.put(USER_IDENTIFIER, user().get().getWorkRequests().iterator().next().getIdentifier(), requestDto()); });
 	}
-
+	
 	@Test
-	void delete() {
+	public void putForbidden() {
 		MockHttpServletRequest request = new MockHttpServletRequest();
 		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
@@ -172,14 +208,110 @@ public class WorkRequestTest {
 		when(securityContext.getAuthentication()).thenReturn(authentication);
 		SecurityContextHolder.setContext(securityContext);
 
+		ResponseEntity<WorkRequestResource> responseOther = workRequestController.put(OTHER_USER_IDENTIFIER, user().get().getWorkRequests().iterator().next().getIdentifier(), requestDto());
+		assertThat(responseOther.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+	}
+	
+	@Test
+	public void putUserNotFound() {
+		MockHttpServletRequest request = new MockHttpServletRequest();
+		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+
+		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(user());
+		when(tidyUserRepository.findByEmail(USER_EMAIL)).thenReturn(user());
+		when(workRequestRepository.save(Mockito.any())).thenReturn(user().get().getWorkRequests().iterator().next());
+
+		User user = new User(USER_EMAIL,"",true,true,true,false,new ArrayList<GrantedAuthority>());
 		
+		Authentication authentication = Mockito.mock(Authentication.class);
+		when(authentication.getPrincipal()).thenReturn(user);
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		when(securityContext.getAuthentication()).thenReturn(authentication);
+		SecurityContextHolder.setContext(securityContext);
+		
+		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(Optional.empty());
+		assertThrows(TidyUserNotFoundException.class, () -> { workRequestController.put(USER_IDENTIFIER, user().get().getWorkRequests().iterator().next().getIdentifier(), requestDto()); });
+	}
+
+	@Test
+	public void deleteOk() {
+		MockHttpServletRequest request = new MockHttpServletRequest();
+		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+
+		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(user());
+		when(tidyUserRepository.findByEmail(USER_EMAIL)).thenReturn(user());
+		when(workRequestRepository.save(Mockito.any())).thenReturn(user().get().getWorkRequests().iterator().next());
+
+		User user = new User(USER_EMAIL,"",true,true,true,false,new ArrayList<GrantedAuthority>());
+		
+		Authentication authentication = Mockito.mock(Authentication.class);
+		when(authentication.getPrincipal()).thenReturn(user);
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		when(securityContext.getAuthentication()).thenReturn(authentication);
+		SecurityContextHolder.setContext(securityContext);
+
 		ResponseEntity<?> response = workRequestController.delete(USER_IDENTIFIER, user().get().getWorkRequests().iterator().next().getIdentifier());
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+	}
+	
+	@Test
+	public void deleteForbidden() {
+		MockHttpServletRequest request = new MockHttpServletRequest();
+		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+
+		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(user());
+		when(tidyUserRepository.findByEmail(USER_EMAIL)).thenReturn(user());
+		when(workRequestRepository.save(Mockito.any())).thenReturn(user().get().getWorkRequests().iterator().next());
+
+		User user = new User(USER_EMAIL,"",true,true,true,false,new ArrayList<GrantedAuthority>());
+		
+		Authentication authentication = Mockito.mock(Authentication.class);
+		when(authentication.getPrincipal()).thenReturn(user);
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		when(securityContext.getAuthentication()).thenReturn(authentication);
+		SecurityContextHolder.setContext(securityContext);
 		
 		ResponseEntity<?> responseOther = workRequestController.delete(OTHER_USER_IDENTIFIER, user().get().getWorkRequests().iterator().next().getIdentifier());
 		assertThat(responseOther.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
-		assertThrows(WorkRequestNotFoundException.class, () -> { workRequestController.delete(USER_IDENTIFIER,user().get().getWorkRequests().iterator().next().getIdentifier()+1L); });
+	}
+	
+	@Test
+	public void deleteWorkRequestNotFound() {
+		MockHttpServletRequest request = new MockHttpServletRequest();
+		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+
+		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(user());
+		when(tidyUserRepository.findByEmail(USER_EMAIL)).thenReturn(user());
+		when(workRequestRepository.save(Mockito.any())).thenReturn(user().get().getWorkRequests().iterator().next());
+
+		User user = new User(USER_EMAIL,"",true,true,true,false,new ArrayList<GrantedAuthority>());
 		
+		Authentication authentication = Mockito.mock(Authentication.class);
+		when(authentication.getPrincipal()).thenReturn(user);
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		when(securityContext.getAuthentication()).thenReturn(authentication);
+		SecurityContextHolder.setContext(securityContext);
+
+		assertThrows(WorkRequestNotFoundException.class, () -> { workRequestController.delete(USER_IDENTIFIER,user().get().getWorkRequests().iterator().next().getIdentifier()+1L); });
+	}
+	
+	@Test
+	public void deleteUserNotFound() {
+		MockHttpServletRequest request = new MockHttpServletRequest();
+		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+
+		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(user());
+		when(tidyUserRepository.findByEmail(USER_EMAIL)).thenReturn(user());
+		when(workRequestRepository.save(Mockito.any())).thenReturn(user().get().getWorkRequests().iterator().next());
+
+		User user = new User(USER_EMAIL,"",true,true,true,false,new ArrayList<GrantedAuthority>());
+		
+		Authentication authentication = Mockito.mock(Authentication.class);
+		when(authentication.getPrincipal()).thenReturn(user);
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		when(securityContext.getAuthentication()).thenReturn(authentication);
+		SecurityContextHolder.setContext(securityContext);
+
 		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(Optional.empty());
 		assertThrows(TidyUserNotFoundException.class, () -> { workRequestController.delete(USER_IDENTIFIER, user().get().getWorkRequests().iterator().next().getIdentifier()); });
 	}

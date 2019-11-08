@@ -48,23 +48,22 @@ public class TidyUserTest {
 	}
 
 	@Test
-	void registeredUserGetsItself() {
+	public void registeredUserGetsItself() {
 		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(user());
 		ResponseEntity<TidyUserResource> response = tidyUserController.get(USER_IDENTIFIER);
 
-		assertThat(response).isNotNull();
 		assertThat(response.getBody()).isEqualTo(new TidyUserResource(user().get()));
 
 	}
 	
 	@Test
-	void notRegisteredUserGetFails() {
+	public void notRegisteredUserGetFails() {
 		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(Optional.empty());
 		assertThrows(TidyUserNotFoundException.class, () -> { tidyUserController.get(USER_IDENTIFIER); });
 	}
 	
 	@Test
-	void registeringNewUser() {
+	public void registeringNewUser() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
         
@@ -73,33 +72,53 @@ public class TidyUserTest {
 		when(tidyUserRepository.save(Mockito.any())).thenReturn(user().get());
 		
 		ResponseEntity<TidyUserResource> response = tidyUserController.post(userdto());
-		assertThat(response).isNotNull();
 		assertThat(response.getBody()).isEqualTo(new TidyUserResource(user().get()));
+	}
+	
+	@Test
+	public void registeringNewUserStatus() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+        
+		when(tidyUserRepository.findByEmail(USER_EMAIL)).thenReturn(Optional.empty());
+		when(roleRepository.findByName(userdto().getRole().toString())).thenReturn(role());
+		when(tidyUserRepository.save(Mockito.any())).thenReturn(user().get());
+		
+		ResponseEntity<TidyUserResource> response = tidyUserController.post(userdto());
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 		
 	}
 
 	@Test
-	void alreadyRegisteredUser() {
+	public void alreadyRegisteredUser() {
 		when(tidyUserRepository.findByEmail(userdto().getEmail())).thenReturn(user());
 		assertThrows(TidyUserAlreadyRegisteredException.class, () -> { tidyUserController.post(userdto()); });
 	}
 	
 	@Test
-	void changeUser() {
+	public void changeUser() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
         
 		when(roleRepository.findByName(roleDto().toString())).thenReturn(role());
 		when(tidyUserRepository.save(Mockito.any())).thenReturn(user().get());
 		ResponseEntity<TidyUserResource> response = tidyUserController.put(USER_IDENTIFIER,userdto());
-		assertThat(response).isNotNull();
 		assertThat(response.getBody()).isEqualTo(new TidyUserResource(user().get()));
+	}
+	
+	@Test
+	public void changeUserStatus() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+        
+		when(roleRepository.findByName(roleDto().toString())).thenReturn(role());
+		when(tidyUserRepository.save(Mockito.any())).thenReturn(user().get());
+		ResponseEntity<TidyUserResource> response = tidyUserController.put(USER_IDENTIFIER,userdto());
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 	}
 	
 	@Test
-	void delete() {
+	public void delete() {
 		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(user());
 		
 		ResponseEntity<?> response = tidyUserController.delete(USER_IDENTIFIER);
@@ -107,18 +126,24 @@ public class TidyUserTest {
 	}
 	
 	@Test
-	void deleteMissing() {
+	public void deleteMissing() {
 		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(Optional.empty());
 		
 		assertThrows(TidyUserNotFoundException.class, () -> { tidyUserController.delete(USER_IDENTIFIER); });
 	}
 	
 	@Test
-	void getAll() {
+	public void getAll() {
+		when(tidyUserRepository.findAll()).thenReturn(new ArrayList<TidyUser>(Arrays.asList(user().get())));
+		ResponseEntity<Resources<TidyUserResource>> response = tidyUserController.all();
+		assertThat(response.getBody().getContent().size()).isEqualTo(1);
+	}
+	
+	@Test
+	public void getAllStatus() {
 		when(tidyUserRepository.findAll()).thenReturn(new ArrayList<TidyUser>(Arrays.asList(user().get())));
 		ResponseEntity<Resources<TidyUserResource>> response = tidyUserController.all();
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-		assertThat(response.getBody().getContent().size()).isEqualTo(1);
 	}
 	
 	
