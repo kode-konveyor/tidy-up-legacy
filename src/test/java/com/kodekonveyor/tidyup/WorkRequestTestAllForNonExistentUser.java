@@ -11,7 +11,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-public class WorkRequestTestAllForNonExistentUser extends WorkRequestTest {
+public class WorkRequestTestAllForNonExistentUser extends WorkRequestTestBase {
 	@Test
 	public void call() {
 		MockHttpServletRequest request = new MockHttpServletRequest();

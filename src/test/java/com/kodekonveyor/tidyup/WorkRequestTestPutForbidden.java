@@ -18,7 +18,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-public class WorkRequestTestPutForbidden extends WorkRequestTest {
+public class WorkRequestTestPutForbidden extends WorkRequestTestBase {
 	@Test
 	public void call() {
 		MockHttpServletRequest request = new MockHttpServletRequest();

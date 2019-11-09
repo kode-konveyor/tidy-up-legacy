@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-public class WorkRequestTestForUserOk extends WorkRequestTest {
+public class WorkRequestTestForUserOk extends WorkRequestTestBase {
 	@Test
 	public void call() {
 		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(user());

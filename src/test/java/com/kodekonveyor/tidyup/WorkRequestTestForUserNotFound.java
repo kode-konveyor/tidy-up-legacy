@@ -5,7 +5,7 @@ import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
 
-public class WorkRequestTestForUserNotFound extends WorkRequestTest {
+public class WorkRequestTestForUserNotFound extends WorkRequestTestBase {
 	@Test
 	public void call() {
 		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(user());

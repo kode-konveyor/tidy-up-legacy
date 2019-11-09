@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 
-public class TidyUserTestDelete extends TidyUserTest {
+public class TidyUserTestDelete extends TidyUserTestBase {
 	@Test
 	public void call() {
 		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(user());

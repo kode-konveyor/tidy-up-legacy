@@ -17,7 +17,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-public class WorkRequestTestDeleteOk extends WorkRequestTest {
+public class WorkRequestTestDeleteOk extends WorkRequestTestBase {
 	@Test
 	public void call() {
 		MockHttpServletRequest request = new MockHttpServletRequest();

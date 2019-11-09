@@ -12,7 +12,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-public class TidyUserTestRegisteringNewUserStatus extends TidyUserTest {
+public class TidyUserTestRegisteringNewUserStatus extends TidyUserTestBase {
 	@Test
 	public void call() {
 		MockHttpServletRequest request = new MockHttpServletRequest();

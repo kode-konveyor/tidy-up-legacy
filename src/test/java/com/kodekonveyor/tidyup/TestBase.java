@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
-public class TestsBase {
+public class TestBase {
 	private static final String USER_PASSWORD = "userpassword";
 	protected static final long USER_IDENTIFIER = 42L;
 	private static final String USER_PASSWORD_ENCODED = "userpasswordencoded";

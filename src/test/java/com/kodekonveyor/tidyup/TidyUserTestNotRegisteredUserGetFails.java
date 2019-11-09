@@ -6,7 +6,7 @@ import static org.mockito.Mockito.when;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
-public class TidyUserTestNotRegisteredUserGetFails extends TidyUserTest {
+public class TidyUserTestNotRegisteredUserGetFails extends TidyUserTestBase {
 	@Test
 	public void call() {
 		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(Optional.empty());

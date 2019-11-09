@@ -8,7 +8,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 
-public class WorkRequestTestNonExistentForUser extends WorkRequestTest {
+public class WorkRequestTestNonExistentForUser extends WorkRequestTestBase {
 	@Test
 	public void call() {
 		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(Optional.empty());
