@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.kodekonveyor</groupId>
 	<artifactId>tidy-up</artifactId>
-	<version>0.0.1-feature_tidy-up-mvp.4bbd5b4</version>
+	<version>0.0.1-feature_tidy-up-mvp.56823ee</version>
 	<name>tidy up</name>
 	<url>http://maven.apache.org</url>
 	<description>A work exchange MVP</description>

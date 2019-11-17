@@ -8,8 +8,10 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
 import lombok.Data;
+import lombok.Generated;
 import lombok.NoArgsConstructor;
 
+@Generated
 @Data
 @Entity
 @NoArgsConstructor
