@@ -20,12 +20,20 @@ import org.springframework.stereotype.Service;
 public class TidyUserDetailsService implements UserDetailsService {
 
 	@Autowired
-	private TidyUserRepository userRepository;
+	final private TidyUserRepository userRepository;
+	
+	public TidyUserDetailsService(final TidyUserRepository userRepository) {
+		super();
+		this.userRepository = userRepository;
+	}
+
 	// API
 
 	@Override
 	public UserDetails loadUserByUsername(final String email) {
-		final TidyUser user = userRepository.findByEmail(email).map(u -> u)
+		final TidyUser user = userRepository
+				.findByEmail(email)
+				.map(u -> u)
 				.orElseThrow(() -> new UsernameNotFoundException("No user found with username: " + email));
 
 		return new User(user.getEmail(), user.getPassword(), true, true, true, true, getAuthorities(user.getRoles()));

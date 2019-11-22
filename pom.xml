@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -6,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.kodekonveyor</groupId>
 	<artifactId>tidy-up</artifactId>
-	<version>0.0.1-feature_tidy-up-mvp.56823ee</version>
+	<version>0.0.1-feature_tidy-up-mvp.95f663e</version>
 	<name>tidy up</name>
 	<url>http://maven.apache.org</url>
 	<description>A work exchange MVP</description>
@@ -312,11 +311,12 @@
 	</dependencyManagement>
 
 	<dependencies>
-		<dependency>
+          <!-- <dependency>
 			<groupId>com.github.markusbernhardt</groupId>
 			<artifactId>xml-doclet</artifactId>
 			<version>1.0.6-SNAPSHOT</version>
-		</dependency>
+                        <scope>provided</scope>
+                </dependency> -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter</artifactId>
@@ -348,10 +348,6 @@
 			<artifactId>mockito-all</artifactId>
 			<version>1.10.19</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-		    <groupId>org.springframework.boot</groupId>
-		    <artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
                 <dependency>
                       <groupId>org.springframework.boot</groupId>

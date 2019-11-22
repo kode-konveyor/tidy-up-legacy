@@ -12,31 +12,57 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.Getter;
+
 @Component
 public class SetupDataLoader implements ApplicationListener<ContextRefreshedEvent> {
+	@Getter
+	private static final String ADMIN_ROLE = "ADMIN";
+
+	@Getter
+	private static final String ADMIN_PRIVILEGE = "ADMIN_PRIVILEGE";
+
+	@Getter
+	private static final String USER_PRIVILEGE = "USER_PRIVILEGE";
+
+	@Getter
+	private static final String WORKER_PRIVILEGE = "WORKER_PRIVILEGE";
+
+	@Getter
+	private static final String CUSTOMER_PRIVILEGE = "CUSTOMER_PRIVILEGE";
+
+	@Getter
+	private static final String ADMIN_TEST_COM = "admin@test.com";
+
+	@Getter
+	private static final String CUSTOMER_TEST_COM = "customer@test.com";
+
+	@Getter
+	private static final String WORKER_TEST_COM = "worker@test.com";
+
+	@Getter
 	private boolean alreadySetup;
 
 	@Autowired
-	private TidyUserRepository userRepository;
+	private final TidyUserRepository userRepository;
 
 	@Autowired
-	private RoleRepository roleRepository;
+	private final RoleRepository roleRepository;
 
 	@Autowired
-	private PrivilegeRepository privilegeRepository;
+	private final PrivilegeRepository privilegeRepository;
 
 	@Autowired
-	private PasswordEncoder passwordEncoder;
+	private final PasswordEncoder passwordEncoder;
 
 	@Override
 	public void onApplicationEvent(final ContextRefreshedEvent event) {
 		if (!this.alreadySetup) {
 			// == create initial privileges
-			// TODO
-			final Privilege customerPrivilege = createPrivilegeIfNotFound("CUSTOMER_PRIVILEGE");
-			final Privilege workerPrivilege = createPrivilegeIfNotFound("WORKER_PRIVILEGE");
-			final Privilege genericUserPrivilege = createPrivilegeIfNotFound("USER_PRIVILEGE");
-			final Privilege adminPrivilege = createPrivilegeIfNotFound("ADMIN_PRIVILEGE");
+			final Privilege customerPrivilege = createPrivilegeIfNotFound(CUSTOMER_PRIVILEGE);
+			final Privilege workerPrivilege = createPrivilegeIfNotFound(WORKER_PRIVILEGE);
+			final Privilege genericUserPrivilege = createPrivilegeIfNotFound(USER_PRIVILEGE);
+			final Privilege adminPrivilege = createPrivilegeIfNotFound(ADMIN_PRIVILEGE);
 
 			// == create initial roles
 			final List<Privilege> customerPrivileges = new ArrayList<>(
@@ -45,14 +71,14 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 					Arrays.asList(workerPrivilege, genericUserPrivilege));
 			final List<Privilege> adminPrivileges = new ArrayList<>(
 					Arrays.asList(workerPrivilege, customerPrivilege, genericUserPrivilege, adminPrivilege));
-			final UserRole customerRole = createRoleIfNotFound(RoleDto.CUSTOMER.toString(), customerPrivileges);
-			final UserRole workerRole = createRoleIfNotFound(RoleDto.WORKER.toString(), workerPrivileges);
-			final UserRole adminRole = createRoleIfNotFound("ADMIN", adminPrivileges);
+			final UserRole customerRole = createRoleIfNotFound(RoleDto.CUSTOMER_ROLE.toString(), customerPrivileges);
+			final UserRole workerRole = createRoleIfNotFound(RoleDto.WORKER_ROLE.toString(), workerPrivileges);
+			final UserRole adminRole = createRoleIfNotFound(ADMIN_ROLE, adminPrivileges);
 
 			// == create initial user
-			createUserIfNotFound("worker@test.com", "test", new ArrayList<UserRole>(Arrays.asList(workerRole)));
-			createUserIfNotFound("customer@test.com", "test", new ArrayList<UserRole>(Arrays.asList(customerRole)));
-			createUserIfNotFound("admin@test.com", "test", new ArrayList<UserRole>(Arrays.asList(adminRole)));
+			createUserIfNotFound(WORKER_TEST_COM, "test", new ArrayList<UserRole>(Arrays.asList(workerRole)));
+			createUserIfNotFound(CUSTOMER_TEST_COM, "test", new ArrayList<UserRole>(Arrays.asList(customerRole)));
+			createUserIfNotFound(ADMIN_TEST_COM, "test", new ArrayList<UserRole>(Arrays.asList(adminRole)));
 
 			this.alreadySetup = true;
 		}
@@ -84,7 +110,10 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 	@Transactional
 	private TidyUser createUserIfNotFound(final String email, final String password,
 			final Collection<UserRole> roles) {
-		TidyUser user = userRepository.findByEmail(email).map(u -> u).orElseGet(() -> {
+		TidyUser user = userRepository
+				.findByEmail(email)
+				.map(u -> u)
+				.orElseGet(() -> {
 			TidyUser newUser = new TidyUser();
 			newUser.setPassword(passwordEncoder.encode(password));
 			newUser.setEmail(email);
@@ -96,4 +125,12 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 		return user;
 	}
 
+	public SetupDataLoader(final TidyUserRepository userRepository, final RoleRepository roleRepository,
+			final PrivilegeRepository privilegeRepository, final PasswordEncoder passwordEncoder) {
+		super();
+		this.userRepository = userRepository;
+		this.roleRepository = roleRepository;
+		this.privilegeRepository = privilegeRepository;
+		this.passwordEncoder = passwordEncoder;
+	}
 }

@@ -14,13 +14,20 @@ public class TestBase {
 	private static final String REQUEST_DESCRIPTION = "want my space to be tidy";
 
 	protected RoleDto roleDto() {
-		return RoleDto.CUSTOMER;
+		return RoleDto.CUSTOMER_ROLE;
 	}
 
 	protected UserRole role() {
 		UserRole role = new UserRole();
 		role.setName(roleDto().toString());
 		role.setIdentifier(USER_IDENTIFIER);
+		
+		Privilege privilege = new Privilege();
+		privilege.setIdentifier(44L);
+		privilege.setName("PRIVILEGE");
+		privilege.setRoles(new ArrayList<UserRole>(Arrays.asList(role)));
+		role.setPrivileges(new ArrayList<Privilege>(Arrays.asList(privilege)));
+
 		return role;
 	}
 

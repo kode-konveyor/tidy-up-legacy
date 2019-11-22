@@ -12,5 +12,4 @@ public class TidyUserAlreadyRegisteredException extends RuntimeException {
 		super("TidyUser is already registered w/ email: " + email);
 		this.email = email;
 	}
-
 }

@@ -4,13 +4,10 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @Getter
-@NoArgsConstructor
 public class WorkRequestResource extends ResourceSupport {
 
 	private static final String ALL_REQUESTS_FROM_CITY = "all-requests-from-city";
@@ -18,7 +15,7 @@ public class WorkRequestResource extends ResourceSupport {
 	private static final String ALL_OWNER_REQUESTS = "all-owner-requests";
 	private static final String REQUEST_ID = "request-id";
 	
-	private WorkRequest workRequest;
+	private final WorkRequest workRequest;
 
 	public WorkRequestResource(final WorkRequest workRequest) {
 		super();

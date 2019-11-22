@@ -50,7 +50,9 @@ public class TidyUserController {
 
 	@GetMapping(SLASH_ID_PARAMETER)
 	public ResponseEntity<TidyUserResource> get(@PathVariable final long identifier) {
-		return tidyUserRepository.findById(identifier).map(p -> ResponseEntity.ok(new TidyUserResource(p)))
+		return tidyUserRepository
+				.findById(identifier)
+				.map(p -> ResponseEntity.ok(new TidyUserResource(p)))
 				.orElseThrow(() -> new TidyUserNotFoundException(identifier));
 	}
 

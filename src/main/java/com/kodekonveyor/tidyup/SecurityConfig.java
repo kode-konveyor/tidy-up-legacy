@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,21 +20,20 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
-	private UserDetailsService userDetailsService;
+	final private UserDetailsService userDetailsService;
 
-	@Bean
-	@Override
-	public AuthenticationManager authenticationManagerBean() throws Exception {
-		return super.authenticationManagerBean();
+	public SecurityConfig(final UserDetailsService userDetailsService) {
+		super();
+		this.userDetailsService = userDetailsService;
 	}
 
 	@Override
-	protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
+	public void configure(final AuthenticationManagerBuilder auth) throws Exception {
 		auth.authenticationProvider(authProvider());
 	}
 
 	@Bean
-	public DaoAuthenticationProvider authProvider() {
+	protected DaoAuthenticationProvider authProvider() {
 		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 		authProvider.setUserDetailsService(userDetailsService);
 		authProvider.setPasswordEncoder(encoder());
@@ -43,19 +41,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 
 	@Bean
-	public PasswordEncoder encoder() {
+	protected PasswordEncoder encoder() {
 		return new BCryptPasswordEncoder(11);
 	}
 
 	@Override
-	protected void configure(final HttpSecurity http) throws Exception {
+	public void configure(final HttpSecurity http) throws Exception {
 		http.csrf().disable().authorizeRequests().antMatchers("/").permitAll().regexMatchers(HttpMethod.POST, "/users")
-				.permitAll().regexMatchers(HttpMethod.GET, "/users").hasAuthority("ADMIN_PRIVILEGE")
+				.permitAll().regexMatchers(HttpMethod.GET, "/users").hasAuthority(SetupDataLoader.getADMIN_PRIVILEGE())
 				.regexMatchers(HttpMethod.GET, "/users/[0-9]*/workrequests").permitAll()
-				.regexMatchers(HttpMethod.POST, "/users/[0-9]*/workrequests").hasAuthority("CUSTOMER_PRIVILEGE")
-				.regexMatchers(HttpMethod.PUT, "/users/[0-9]*/workrequests").hasAuthority("CUSTOMER_PRIVILEGE")
+				.regexMatchers(HttpMethod.POST, "/users/[0-9]*/workrequests").hasAuthority(SetupDataLoader.getCUSTOMER_PRIVILEGE())
+				.regexMatchers(HttpMethod.PUT, "/users/[0-9]*/workrequests").hasAuthority(SetupDataLoader.getCUSTOMER_PRIVILEGE())
 				.regexMatchers(HttpMethod.DELETE, "/users/[0-9]*/workrequests/[0-9]*")
-				.hasAuthority("CUSTOMER_PRIVILEGE").anyRequest().authenticated().and().httpBasic();
+				.hasAuthority(SetupDataLoader.getCUSTOMER_PRIVILEGE()).anyRequest().authenticated().and().httpBasic();
 	}
 
 	@Bean
