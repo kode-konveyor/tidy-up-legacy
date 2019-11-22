@@ -15,6 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SecurityConfigTest {
 
 	final private ObjectPostProcessor<Object> objectPostProcessor = new ObjectPostProcessor<Object>() {
+		@Override
 		public <T> T postProcess(final T object) {
 			return object;
 		}
