@@ -1,7 +1,6 @@
 package com.kodekonveyor.tidyup;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -43,8 +42,6 @@ public class TidyUserController {
 		final List<TidyUserResource> collection = tidyUserRepository.findAll().stream().map(TidyUserResource::new)
 				.collect(Collectors.toList());
 		final Resources<TidyUserResource> resources = new Resources<>(collection);
-		final String uriString = ServletUriComponentsBuilder.fromCurrentRequest().build().toUriString();
-		resources.add(new Link(uriString, "self"));
 		return ResponseEntity.ok(resources);
 	}
 

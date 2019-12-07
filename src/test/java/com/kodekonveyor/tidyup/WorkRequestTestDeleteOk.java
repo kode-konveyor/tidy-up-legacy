@@ -1,13 +1,13 @@
 package com.kodekonveyor.tidyup;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -35,8 +35,10 @@ public class WorkRequestTestDeleteOk extends WorkRequestTestBase {
 		when(securityContext.getAuthentication()).thenReturn(authentication);
 		SecurityContextHolder.setContext(securityContext);
 
-		ResponseEntity<?> response = workRequestController.delete(USER_IDENTIFIER,
-				user().get().getWorkRequests().iterator().next().getIdentifier());
-		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+		ArgumentCaptor<WorkRequest> deleted = ArgumentCaptor.forClass(WorkRequest.class);
+		Long workRequestIdentifier = user().get().getWorkRequests().iterator().next().getIdentifier();
+		doNothing().when(workRequestRepository).delete(deleted.capture());
+		workRequestController.delete(USER_IDENTIFIER, workRequestIdentifier);
+		assertThat(deleted.getValue().getIdentifier()).isEqualTo(workRequestIdentifier);
 	}
 }

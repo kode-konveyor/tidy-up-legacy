@@ -26,7 +26,18 @@ public class WorkRequestTestPutOk extends WorkRequestTestBase {
 
 		when(tidyUserRepository.findById(USER_IDENTIFIER)).thenReturn(user());
 		when(tidyUserRepository.findByEmail(USER_EMAIL)).thenReturn(user());
-		when(workRequestRepository.save(Mockito.any())).thenReturn(user().get().getWorkRequests().iterator().next());
+		when(workRequestRepository.save(Mockito.any())).thenAnswer(
+				invocation ->
+				{
+					WorkRequest workRequest = invocation.getArgumentAt(0, WorkRequest.class);
+					if (workRequest.getCity().equals(requestDto().getCity())
+                        && workRequest.getDescription().equals(requestDto().getDescription())
+							&& workRequest.getIdentifier().equals(user().get().getWorkRequests().iterator().next().getIdentifier())
+							&& workRequest.getUser().getIdentifier().equals(user().get().getIdentifier()))
+						return user().get().getWorkRequests().iterator().next();
+					else
+						throw new IllegalArgumentException();
+				});
 
 		User user = new User(USER_EMAIL, "", true, true, true, false, new ArrayList<GrantedAuthority>());
 

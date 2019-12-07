@@ -108,7 +108,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 	}
 
 	@Transactional
-	private TidyUser createUserIfNotFound(final String email, final String password,
+	private void createUserIfNotFound(final String email, final String password,
 			final Collection<UserRole> roles) {
 		TidyUser user = userRepository
 				.findByEmail(email)
@@ -121,8 +121,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 		});
 
 		user.setRoles(roles);
-		user = userRepository.save(user);
-		return user;
+		userRepository.save(user);
 	}
 
 	public SetupDataLoader(final TidyUserRepository userRepository, final RoleRepository roleRepository,

@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.security.core.userdetails.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +24,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @RequestMapping(value = "", produces = "application/hal+json")
 public class WorkRequestController {
 
-	private static final String SELF = "self";
+	// private static final String SELF = "self";
 
 	@Autowired
 	private final TidyUserRepository tidyUserRepository;
@@ -42,8 +41,8 @@ public class WorkRequestController {
 	public ResponseEntity<Resources<WorkRequestResource>> all(@PathVariable final long userId) {
 		final List<WorkRequestResource> collection = getWorkRequestsForUser(userId);
 		final Resources<WorkRequestResource> resources = new Resources<>(collection);
-		final String uriString = ServletUriComponentsBuilder.fromCurrentRequest().build().toUriString();
-		resources.add(new Link(uriString, SELF));
+		// final String uriString = ServletUriComponentsBuilder.fromCurrentRequest().build().toUriString();
+		// resources.add(new Link(uriString, SELF));
 		return ResponseEntity.ok(resources);
 	}
 
@@ -140,8 +139,8 @@ public class WorkRequestController {
 	public ResponseEntity<Resources<WorkRequestResource>> city(@PathVariable final String city) {
 		final List<WorkRequestResource> collection = getWorkRequestsForCity(city);
 		final Resources<WorkRequestResource> resources = new Resources<>(collection);
-		final String uriString = ServletUriComponentsBuilder.fromCurrentRequest().build().toUriString();
-		resources.add(new Link(uriString, SELF));
+		// final String uriString = ServletUriComponentsBuilder.fromCurrentRequest().build().toUriString();
+		// resources.add(new Link(uriString, SELF));
 		return ResponseEntity.ok(resources);
 	}
 }
