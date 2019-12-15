@@ -29,4 +29,13 @@ class TidyUserDetailsServiceTest extends TidyUserTestBase {
 				.loadUserByUsername(user().get().getEmail()); });
 	}
 
+	@Test
+	public void testLoadUserByUsernameAuthorities() {
+		when(tidyUserRepository.findByEmail(user().get().getEmail())).thenReturn(user());
+		assertThat(new TidyUserDetailsService(tidyUserRepository)
+				.loadUserByUsername(user().get().getEmail())
+				.getAuthorities().size())
+				.isEqualTo(1);
+	}
+
 }

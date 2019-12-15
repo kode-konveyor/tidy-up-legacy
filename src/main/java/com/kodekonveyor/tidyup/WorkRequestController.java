@@ -2,6 +2,7 @@ package com.kodekonveyor.tidyup;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.security.core.userdetails.User;
@@ -92,6 +93,7 @@ public class WorkRequestController {
 			requestToSave.setUser(p);
 			WorkRequest request = workRequestRepository.save(requestToSave);
 			final URI uri = createPostUri(request);
+			Objects.requireNonNull(uri);
 			return ResponseEntity.created(uri).body(new WorkRequestResource(request));
 		}).orElseThrow(() -> new TidyUserNotFoundException(userId));
 	}

@@ -22,7 +22,6 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 	@Getter
 	private static final String ADMIN_PRIVILEGE = "ADMIN_PRIVILEGE";
 
-	@Getter
 	private static final String USER_PRIVILEGE = "USER_PRIVILEGE";
 
 	@Getter

@@ -5,9 +5,12 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,8 +21,13 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 public class WorkRequestTestDeleteOk extends WorkRequestTestBase {
-	@Test
-	public void call() {
+	private ArgumentCaptor<WorkRequest> deleted;
+	private ResponseEntity<?> response;
+
+	@BeforeEach
+    @Override
+	public void setUp() {
+		super.setUp();
 		MockHttpServletRequest request = new MockHttpServletRequest();
 		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
@@ -35,10 +43,20 @@ public class WorkRequestTestDeleteOk extends WorkRequestTestBase {
 		when(securityContext.getAuthentication()).thenReturn(authentication);
 		SecurityContextHolder.setContext(securityContext);
 
-		ArgumentCaptor<WorkRequest> deleted = ArgumentCaptor.forClass(WorkRequest.class);
-		Long workRequestIdentifier = user().get().getWorkRequests().iterator().next().getIdentifier();
+		this.deleted = ArgumentCaptor.forClass(WorkRequest.class);
 		doNothing().when(workRequestRepository).delete(deleted.capture());
-		workRequestController.delete(USER_IDENTIFIER, workRequestIdentifier);
-		assertThat(deleted.getValue().getIdentifier()).isEqualTo(workRequestIdentifier);
+		Long workRequestIdentifier = user().get().getWorkRequests().iterator().next().getIdentifier();
+		this.response = workRequestController.delete(USER_IDENTIFIER, workRequestIdentifier);
+	}
+
+	@Test
+	public void correctDeleteId() {
+		Long workRequestIdentifier = user().get().getWorkRequests().iterator().next().getIdentifier();
+		assertThat(this.deleted.getValue().getIdentifier()).isEqualTo(workRequestIdentifier);
+    }
+
+	@Test
+	public void notNullResponse() {
+		assertThat(this.response).isNotNull();
 	}
 }

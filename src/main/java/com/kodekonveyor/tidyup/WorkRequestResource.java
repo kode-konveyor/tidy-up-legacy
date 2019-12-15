@@ -15,11 +15,8 @@ public class WorkRequestResource extends ResourceSupport {
 	private static final String ALL_OWNER_REQUESTS = "all-owner-requests";
 	private static final String REQUEST_ID = "request-id";
 	
-	private final WorkRequest workRequest;
-
 	public WorkRequestResource(final WorkRequest workRequest) {
 		super();
-		this.workRequest = workRequest;
 		final long identifier = workRequest.getIdentifier();
 		final long userIdentifier = workRequest.getUser().getIdentifier();
 		final String city = workRequest.getCity();
